@@ -1,5 +1,5 @@
 const { authJwt } = require("../middlewares");
-const controller = require("../controllers/participant.controller");
+const controller = require("../controllers/announcement.controller");
 
 module.exports = function(app) {
   app.use(function(req, res, next) {
@@ -10,8 +10,9 @@ module.exports = function(app) {
     next();
   });
 
-  app.get("/api/participant/all", [authJwt.verifyToken, authJwt.isAdmin], controller.index);
-  app.get("/api/participant/:id", [authJwt.verifyToken], controller.view);
-  app.put("/api/participant/:id/verify", [authJwt.verifyToken, authJwt.isAdmin], controller.verify);
-  app.put("/api/participant/:id/upload", [authJwt.verifyToken, authJwt.isParticipant], controller.upload);
+  app.get("/api/announcement/all", [authJwt.verifyToken], controller.index);
+  app.get("/api/announcement/:id", [authJwt.verifyToken], controller.view);
+  app.post("/api/announcement/", [authJwt.verifyToken, authJwt.isAdmin], controller.create);
+  app.put("/api/announcement/:id", [authJwt.verifyToken, authJwt.isAdmin], controller.view);
+  app.delete("/api/announcement/:id", [authJwt.verifyToken, authJwt.isAdmin], controller.view);
 };

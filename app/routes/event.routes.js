@@ -1,5 +1,5 @@
 const { authJwt } = require("../middlewares");
-const controller = require("../controllers/stage.controller");
+const controller = require("../controllers/event.controller");
 
 module.exports = function(app) {
   app.use(function(req, res, next) {
@@ -10,8 +10,7 @@ module.exports = function(app) {
     next();
   });
 
-  app.get("/api/stage/all", [authJwt.verifyToken, authJwt.isAdmin], controller.index);
-  app.get("/api/stage/:id", [authJwt.verifyToken, authJwt.isAdmin], controller.view);
-  app.put("/api/stage/:id", [authJwt.verifyToken, authJwt.isAdmin], controller.update);
-  app.put("/api/stage/:id/add", [authJwt.verifyToken, authJwt.isAdmin], controller.add);
+  app.get("/api/event/all", [authJwt.verifyToken, authJwt.isAdmin], controller.index);
+  app.get("/api/event/:id", [authJwt.verifyToken, authJwt.isAdmin], controller.view);
+  app.put("/api/event/:id", [authJwt.verifyToken, authJwt.isAdmin], controller.update);
 };

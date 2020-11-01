@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const db = require("./app/models");
 const Role = db.role;
 const Stage = db.stage;
-
+const Event = db.event;
 
 db.mongoose
   .connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
@@ -35,7 +35,13 @@ db.mongoose
 require("./app/routes/auth.routes")(app);
 require("./app/routes/participant.routes")(app);
 require("./app/routes/admin.routes")(app);
+require("./app/routes/announcement.routes")(app);
+require("./app/routes/answer-form.routes")(app);
+require("./app/routes/answer.routes")(app);
+require("./app/routes/payment.routes")(app);
+require("./app/routes/event.routes")(app);
 require("./app/routes/stage.routes")(app);
+require("./app/routes/question.routes")(app);
 require("./app/routes/announcement.routes")(app);
 
 const PORT = process.env.PORT || 3000;
@@ -78,37 +84,124 @@ function initial() {
     }
   });
 
-  Stage.estimatedDocumentCount((err, count) => {
+  Event.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
+      var stages = []
+
       new Stage({
         name: "preliminary"
-      }).save(err => {
+      }).save((err, stage) => {
         if (err) {
           console.log("error", err);
         }
 
-        console.log("Preliminary Stage added successfuly")
+        stages.push(stage._id)
+
+        console.log("Preliminary Stage of OSM added successfuly")
+
+        new Stage({
+          name: "semifinal"
+        }).save((err, stage) => {
+          if (err) {
+            console.log("error", err);
+          }
+
+          stages.push(stage._id);    
+          console.log("Semifinal Stage of OSM added successfuly")
+
+          new Stage({
+            name: "final"
+          }).save((err, stage) => {
+            if (err) {
+              console.log("error", err);
+            }
+
+            stages.push(stage._id)
+            console.log("Final Stage of OSM added successfuly");
+
+            new Event({
+              name: "OSM",
+              stages: stages,
+            }).save((err, event) => {
+              if (err) {
+                console.log("error", err);
+              }
+
+              console.log("OSM added successfuly")
+            });
+          });
+        });
       });
+
+      var stages2 = []
 
       new Stage({
-        name: "semifinal"
-      }).save(err => {
+        name: "preliminary"
+      }).save((err, stage) => {
         if (err) {
           console.log("error", err);
         }
 
-        console.log("Semifinal Stage added successfuly")
+        stages2.push(stage._id);
+        console.log("Preliminary Stage of Ranking 1 added successfuly")
+      
+        new Stage({
+          name: "semifinal"
+        }).save((err, stage) => {
+          if (err) {
+            console.log("error", err);
+          }
+
+          stages2.push(stage._id);
+          console.log("Semifinal Stage of Ranking 1 added successfuly");
+
+          new Stage({
+            name: "final"
+          }).save((err, stage) => {
+            if (err) {
+              console.log("error", err);
+            }
+
+            stages2.push(stage._id)
+            console.log("Final Stage of Ranking 1 added successfuly")
+          
+            new Event({
+              name: "Ranking 1",
+              stages: stages2,
+            }).save((err, event) => {
+              if (err) {
+                console.log("error", err);
+              }
+              
+              console.log("Ranking 1 added successfuly")
+            });
+          });
+        });
       });
+
+      var stages3 = []
 
       new Stage({
         name: "final"
-      }).save(err => {
+      }).save((err, stage) => {
         if (err) {
           console.log("error", err);
         }
 
-        console.log("Final Stage added successfuly")
+        stages3.push(stage._id);
+        console.log("Final of Ranking 1 added successfuly")
+      
+        new Event({
+          name: "Poster",
+          stages: stages,
+        }).save((err, event) => {
+          if (err) {
+            console.log("error", err);
+          }
+          
+          console.log("Poster added successfuly")
+        });
       });
     }
-  });
+  })
 }

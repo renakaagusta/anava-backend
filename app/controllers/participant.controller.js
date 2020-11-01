@@ -2,6 +2,7 @@
 const db = require("../models");
 const Participant = db.user;
 const Role = db.role;
+const Stage = db.stage;
 
 var multer = require('multer');
 var path = require('path');
@@ -86,7 +87,7 @@ exports.update = function (req, res) {
             username: req.body.username,
             email: req.body.email,
             password: req.body.password,
-            updatedAt: Date.Now(),
+            updated_at: Date.now(),
         }})
     .then((participant)=>{
         if(participant) {
@@ -265,9 +266,21 @@ exports.delete = function (req, res) {
         }, function (err, participant) {
             if (err)
                 return res.send(err);
-        return res.json({
-            status: "success",
-            message: "Participant Deleted!"
-        });
+
+            Stage.findOneAndUpdate({
+                $participants: req.params.id
+            }, {
+                $pull: {
+                    $participants: req.params.id,
+                }
+            }, function(err, stage) {
+                if (err)
+                    return res.send(err)
+
+                return res.json({
+                    status: "success",
+                    message: "Participant Deleted!"
+                });
+            })
     });
 };

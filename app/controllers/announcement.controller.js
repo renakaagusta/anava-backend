@@ -65,7 +65,7 @@ exports.update = function (req, res) {
         {$set: {
             title: req.body.title,
             content: req.body.content,
-            updated_at: Date.Now(),
+            updated_at: Date.now(),
         }})
     .then((announcement)=>{
         if(announcement) {

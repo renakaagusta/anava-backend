@@ -1,6 +1,8 @@
 const config = require("../config/auth.config");
 const db = require("../models");
 const User = db.user;
+const Event = db.event;
+const Stage = db.stage;
 const Role = db.role;
 
 var jwt = require("jsonwebtoken");
@@ -116,13 +118,28 @@ exports.signin = (req, res) => {
       var authorities = [];
 
       for (let i = 0; i < user.roles.length; i++) {
-        authorities.push("ROLE_" + user.roles[i].name.toUpperCase());
+        authorities.push(user.roles[i].name);
       }
+
+      var event = [];
+
+      user.participant.event.forEach((event_id)=> {
+        Event.findById(event_id, function (err, _event) {
+          if (err)
+              return res.status(400).send(err);
+
+          event.push(_event);
+        });
+      })
+
+      user.participant.event = event;
+
       res.status(200).send({
         id: user._id,
         username: user.username,
         email: user.email,
         roles: authorities,
+        participant: user.participant,
         accessToken: token
       });
     });

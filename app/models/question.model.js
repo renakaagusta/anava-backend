@@ -7,11 +7,14 @@ const Question = mongoose.model(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Stage"
     },
+    number: Number,
     title: String,
     content: String,
+    description: String,
     solution: String,
     key: String,
     price: Number,
+    time: Number,
     option: [
       { 
         letter: String,

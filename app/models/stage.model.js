@@ -9,8 +9,20 @@ const Stage = mongoose.model(
         participants: [
           {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Participant",
+            ref: "User",
           },
+        ],
+        questions: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Question",
+          }
+        ],
+        answer_forms: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "AnswerForm",
+          }
         ],
         started_at: {
           type: Date,

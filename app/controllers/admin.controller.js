@@ -87,7 +87,7 @@ exports.update = function (req, res) {
             username: req.body.username,
             email: req.body.email,
             password: req.body.password,
-            updated_at: Date.Now(),
+            updated_at: Date.now(),
         }})
     .then((admin)=>{
         if(admin) {
