@@ -9,7 +9,8 @@ module.exports = function(app) {
     );
     next();
   });
-
+  app.get("/api/auth/find-by-email/", controller.findByEmail);
+  app.post("/api/auth/request-change-password/:email", controller.requestChangePassword);
   app.post(
     "/api/auth/signup",
     [
@@ -18,6 +19,8 @@ module.exports = function(app) {
     ],
     controller.signup
   );
-
   app.post("/api/auth/signin", controller.signin);
+  app.put("/api/auth/change-password/:id", controller.changePassword);
+  app.put("/api/auth/confirm-email/:id", controller.confirmEmail);
+  
 };

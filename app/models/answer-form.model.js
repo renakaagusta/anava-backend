@@ -3,22 +3,34 @@ const mongoose = require("mongoose");
 const AnswerForm = mongoose.model(
   "AnswerForm",
   new mongoose.Schema({
-    stage: 
-    {
+    stage: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Stage",
     },
-    participant: 
-    {
+    participant: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Participant",
     },
-    answers:[
+    questions: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Answer"
-      }
+        ref: "Question",
+      },
     ],
+    answers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Answer",
+      },
+    ],
+    poin: {
+      type: Number,
+      default: 0,
+    },
+    score: {
+      type: Number,
+      default: 0,
+    },
     created_at: {
       type: Date,
       default: Date.now(),

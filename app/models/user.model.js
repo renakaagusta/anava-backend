@@ -4,45 +4,62 @@ const User = mongoose.model(
   "User",
   new mongoose.Schema({
     username: String,
-    email: String,
-    image: String,
     password: String,
-    email_confirmation: {
-      type: Number, 
+    email: String,
+    firstname: {
+      type: String,
+      default: "first",
+    },
+    lastname: {
+      type: String,
+      default: "last",
+    },
+    image: {
+      type: String,
+      default: "avatar.jpg",
+    },
+    verification: {
+      type: Number,
       default: 0,
     },
     roles: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Role"
-      }
+        ref: "Role",
+      },
     ],
     admin: {
       division: {
         type: String,
-        default: '',
-      }
+        default: "",
+      },
     },
     participant: {
       location: {
         subdistrict: {
           type: String,
-          default: '',
+          default: "",
         },
         city: {
           type: String,
-          default: '',
+          default: "",
         },
         province: {
           type: String,
-          default: '',
-        }
+          default: "",
+        },
       },
       school: {
-        type: String,
-        default: ''
+        name: {
+          type: String,
+          default: "SMA",
+        },
+        address: {
+          type: String,
+          default: "SMA",
+        },
       },
-      document : {
+      document: {
         image: {
           status: Number,
           default: 0,
@@ -52,64 +69,64 @@ const User = mongoose.model(
           default: 0,
         },
       },
-      event: [{
-        id: {
+      events: [
+        {
+          id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Event",
+          },
+          name: {
+            type: String,
+            default: "",
+          },
+          stages: [
+            {
+              id: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Stage",
+              },
+              name: {
+                type: String,
+                default: "",
+              },
+              session: {
+                type: String,
+                default: "",
+              },
+              created_at: {
+                type: Date,
+                default: Date.now(),
+              },
+              updated_at: {
+                type: Date,
+                default: Date.now(),
+              },
+            },
+          ],
+          created_at: {
+            type: Date,
+            default: Date.now(),
+          },
+          updated_at: {
+            type: Date,
+            default: Date.now(),
+          },
+        },
+      ],
+      certificate: [
+        {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Stage"
+          ref: "Certificate",
         },
-        name: {
-          type: String,
-          default: ''
-        },
-        stages: [
-          {
-            id: {
-              type: mongoose.Schema.Types.ObjectId,
-              ref: "Stage"
-            },
-            name: {
-              type: String,
-              default: ''
-            },
-            poin: {
-              type: Number,
-              default: 0,
-            },
-            score: {
-              type: Number,
-              default: 0,
-            },
-            created_at: {
-              type: Date,
-              default: Date.now()
-            },
-            updated_at: {
-              type: Date,
-              default: Date.now()
-            }
-          }
-        ],
-        created_at: {
-          type: Date,
-          default: Date.now()
-        },
-        updated_at: {
-          type: Date,
-          default: Date.now()
-        }
-      }],
-      certificate: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Certificate",
-      }]
+      ],
     },
     created_at: {
       type: Date,
-      default: Date.now()
+      default: Date.now(),
     },
     updated_at: {
       type: Date,
-      default: Date.now()
+      default: Date.now(),
     },
   })
 );

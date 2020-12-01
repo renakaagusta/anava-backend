@@ -27,11 +27,12 @@ exports.view = function (req, res) {
         if (err)
             return res.send(err);
 
-        Admin.findById(announcement._id, function(err, admin) {
+        Admin.findById(announcement.admin, function(err, admin) {
             if(err)
                 return res.status(400).send(err);
             
-            announcement.author = admin
+            announcement = JSON.parse(JSON.stringify(announcement));
+            announcement.admin = admin;
             
             return res.json({
                 message: "announcements Detail Loading...",
@@ -44,7 +45,7 @@ exports.view = function (req, res) {
 // Handle create actions
 exports.create = function (req, res) {
     var announcement = new Announcement({
-        author_id: req.body.admin_id,
+        admin: req.body.adminId,
         title: req.body.title,
         content: req.body.content,
     }).save((err)=> {

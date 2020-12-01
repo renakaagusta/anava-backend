@@ -13,8 +13,10 @@ const Answer = mongoose.model(
       ref: "AnswerForm"
     },
     choosed_option: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "chooosedOption"
+      type: String,
+    },
+    key: {
+      type: String,
     },
     uploaded: {
       type: Number,

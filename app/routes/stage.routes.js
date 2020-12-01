@@ -10,8 +10,8 @@ module.exports = function(app) {
     next();
   });
 
-  app.get("/api/stage/all", [authJwt.verifyToken, authJwt.isAdmin], controller.index);
-  app.get("/api/stage/:id", [authJwt.verifyToken, authJwt.isAdmin], controller.view);
+  app.get("/api/stage/all", [authJwt.verifyToken], controller.index);
+  app.get("/api/stage/:id", [authJwt.verifyToken], controller.view);
   app.put("/api/stage/:id", [authJwt.verifyToken, authJwt.isAdmin], controller.update);
   app.put("/api/stage/:id/add", [authJwt.verifyToken, authJwt.isAdmin], controller.add);
 };

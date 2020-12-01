@@ -11,6 +11,7 @@ module.exports = function(app) {
   });
 
   app.get("/api/question/:id", [authJwt.verifyToken], controller.view);
+  app.get("/api/question/stage/:stageId", [authJwt.verifyToken], controller.indexByStage);
   app.post("/api/question/", [authJwt.verifyToken, authJwt.isAdmin], controller.create);
   app.put("/api/question/:id", [authJwt.verifyToken, authJwt.isAdmin], controller.update);
   app.delete("/api/question/:id", [authJwt.verifyToken, authJwt.isAdmin], controller.delete);

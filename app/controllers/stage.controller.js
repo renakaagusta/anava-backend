@@ -1,9 +1,10 @@
 // Import Stage model
 const db = require("../models");
+const Event = db.event;
 const Stage = db.stage;
 const Participant = db.user;
 const Question = db.question;
-const AnswerForm = db.answerForm
+const AnswerForm = db.answerForm;
 
 // Handle index actions
 exports.index = function (req, res) {
@@ -28,21 +29,28 @@ exports.view = async function (req, res) {
     if (err) return res.status(400).send(err);
     var participants = [];
     await Promise.all(
-      stage.participants.map(async (participant_id) => {
+      stage.participants.map(async (participant) => {
         try {
           var participant = await Participant.findById(
-            participant_id,
+            participant.participant,
             function (err, stage) {
               if (err) return res.status(400).send(err);
             }
           );
           participants.push(participant);
+          console.log(participant)
         } catch (error) {
           console.log("error: " + error);
         }
       })
     );
-    stage.participants = participants;
+    stage.participants = [];
+    stage.participants =participants;
+
+    var _stage = {
+      participants: participants
+    }
+
     var questions = [];
     await Promise.all(
       stage.questions.map(async (question_id) => {
@@ -59,7 +67,7 @@ exports.view = async function (req, res) {
         }
       })
     );
-    stage.questions = questions;
+    _stage.questions = questions;
     var answerForms = [];
     await Promise.all(
       stage.answer_forms.map(async (answer_form_id) => {
@@ -76,10 +84,21 @@ exports.view = async function (req, res) {
         }
       })
     );
-    stage.answer_forms = answerForms;
+    _stage.answer_forms = answerForms;
+    _stage.event = stage.event;
+    _stage._id = stage._id;
+    _stage.name = stage.name;
+    _stage.description = stage.description;
+    _stage.rules = stage.rules;
+    _stage.event = stage.event;
+    _stage.session = stage.session;
+    _stage.type = stage.type;
+    _stage.started_at = stage.started_at;
+    _stage.finished_at = stage.finished_at;
+    
     return res.json({
       message: "event Detail Loading...",
-      data: stage,
+      data: _stage,
     });
   });
 };
@@ -128,30 +147,116 @@ exports.add = function (req, res) {
     },
     {
       $push: {
-        participants: req.body.participantId,
+        participants: {
+          participant: req.body.participantId,
+          session: req.body.session ? req.body.session : 1,
+        },
       },
     },
     function (err, stage) {
       if (err) throw err;
 
-      Participant.findOneAndUpdate(
-        {
-          _id: req.body.participantId,
-        },
-        {
-          $push: {
-            stages: {
-              id: req.params.id,
-            },
-          },
-        },
+      const participant = Participant.findById(
+        req.body.participantId,
         function (err, participant) {
           if (err) throw err;
 
-          return res.json({
-            message: "Participant added to stage",
-            data: stage,
-          });
+          console.log("participant: " + JSON.stringify(participant));
+
+          if (participant.participant.events.length == 0) {
+            var event = Event.findOne(
+              {
+                stages: db.mongoose.Types.ObjectId(req.params.id),
+              },
+              function (err, _event) {
+                if (err) throw err;
+
+                var event = {
+                  id: _event._id,
+                  name: _event.name,
+                  stages: {
+                    id: req.params.id,
+                    name: stage.name,
+                    session: req.body.session ? req.body.session : 1,
+                  },
+                };
+
+                var participant = Participant.findOne(
+                  {
+                    _id: req.body.participantId,
+                  },
+                  function (err, participant) {
+                    if (err) throw err;
+
+                    participant.participant.events.push(event);
+
+                    participant.save((err, participant) => {
+                      if (err) throw err;
+
+                      return res.json({
+                        message: "Participant added to stage",
+                        data: stage,
+                      });
+                    });
+                  }
+                );
+              }
+            );
+          } else {
+            var event = Event.findOne(
+              {
+                stages: db.mongoose.Types.ObjectId(req.params.id),
+              },
+              function (err, event) {
+                if (err) throw err;
+
+                var participant = Participant.findById(
+                  req.body.participantId,
+                  function (err, _participant) {
+                    if (err) throw err;
+
+                    var events = _participant.participant.events;
+                    var index = 0;
+                    var find = 0;
+                    _participant.participant.events.forEach((_event) => {
+                      if (_event.id == event._id) {
+                        find = 1;
+                        events[index].stages.push({
+                          id: req.params.id,
+                          name: stage.name,
+                          session: req.body.session ? req.body.session : 1,
+                        });
+                      }
+                      index++;
+                    });
+
+                    if(find==0) {
+                      var newEvent = {
+                        id: event._id,
+                        name: event.name,
+                        stages: {
+                          id: req.params.id,
+                          name: stage.name,
+                          session: req.body.session ? req.body.session : 1,
+                        },
+                      };
+                      events.push(newEvent)
+                    }
+
+                    _participant.participant.events = events;
+
+                    _participant.save((err, participant) => {
+                      if (err) throw err;
+                      return res.json({
+                        message: "participant succesfully added",
+                        data: participant,
+                      });
+                    });
+                  }
+                );
+              }
+            );
+          }
         }
       );
     }

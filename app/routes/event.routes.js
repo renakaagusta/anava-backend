@@ -10,7 +10,7 @@ module.exports = function(app) {
     next();
   });
 
-  app.get("/api/event/all", [authJwt.verifyToken, authJwt.isAdmin], controller.index);
-  app.get("/api/event/:id", [authJwt.verifyToken, authJwt.isAdmin], controller.view);
+  app.get("/api/event/all", [authJwt.verifyToken], controller.index);
+  app.get("/api/event/:id", [authJwt.verifyToken], controller.view);
   app.put("/api/event/:id", [authJwt.verifyToken, authJwt.isAdmin], controller.update);
 };

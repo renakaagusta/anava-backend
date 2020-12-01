@@ -3,7 +3,10 @@ const mongoose = require("mongoose");
 const Announcement = mongoose.model(
   "Announcement",
   new mongoose.Schema({
-    author_id: String,
+    admin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Admin"
+    },
     title: String,
     content: String,
     created_at: {

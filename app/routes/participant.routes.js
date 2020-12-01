@@ -12,6 +12,7 @@ module.exports = function(app) {
 
   app.get("/api/participant/all", [authJwt.verifyToken, authJwt.isAdmin], controller.index);
   app.get("/api/participant/:id", [authJwt.verifyToken], controller.view);
+  app.put("/api/participant/:id", [authJwt.verifyToken], controller.update);
   app.put("/api/participant/:id/verify", [authJwt.verifyToken, authJwt.isAdmin], controller.verify);
   app.put("/api/participant/:id/upload", [authJwt.verifyToken, authJwt.isParticipant], controller.upload);
   app.delete("/api/participant/:id", [authJwt.verifyToken, authJwt.isAdmin], controller.delete);

@@ -15,7 +15,8 @@ const Question = mongoose.model(
     key: String,
     price: Number,
     time: Number,
-    option: [
+    session: Number,
+    options: [
       { 
         letter: String,
         content: String,

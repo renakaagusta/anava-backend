@@ -15,6 +15,29 @@ exports.view = function (req, res) {
   });
 };
 
+// Handle index actions
+exports.indexByStage = function (req, res) {
+  Question.find(
+    {
+      stage: req.params.stageId,
+    },
+    function (err, questions) {
+      if (err) {
+        return res.json({
+          status: "error",
+          message: err,
+        });
+      }
+
+      return res.json({
+        status: "success",
+        message: "Question Added Successfully",
+        data: questions,
+      });
+    }
+  );
+};
+
 // Handle create actions
 exports.create = function (req, res) {
   var question = new Question({
@@ -31,6 +54,27 @@ exports.create = function (req, res) {
   }).save((err, question) => {
     if (err) return res.json(err);
 
+    //OSM Penyisihan & Ranking 1 Babak Gugur
+    if(req.body.options) {
+      switch(question.key) {
+        case 'A':
+          question.key = question.options[0]._id;
+        break;
+        case 'B':
+          question.key = question.options[1]._id;
+        break;
+        case 'C':
+          question.key = question.options[2]._id;
+        break;
+        case 'D':
+          question.key = question.options[3]._id;
+        break;
+        case 'E':
+          question.key = question.options[4]._id;
+        break;
+      }
+    }
+
     Stage.update(
       { _id: req.body.stageId },
       {
@@ -41,7 +85,7 @@ exports.create = function (req, res) {
       { safe: true, upsert: true },
       function (err, stage) {
         if (err) return res.json(err);
-        
+
         return res.json({
           message: "question succesfully created",
           data: question,
@@ -73,6 +117,8 @@ exports.update = function (req, res) {
     }
   )
     .then((question) => {
+      console.log(JSON.stringify(question))
+      console.log(req.body.content)
       if (question) {
         return res.json({
           message: "question updated",
@@ -95,7 +141,7 @@ exports.update = function (req, res) {
 
 // Handle delete actions
 exports.delete = function (req, res) {
-    Question.findOne(
+  Question.findOne(
     {
       _id: req.params.id,
     },
