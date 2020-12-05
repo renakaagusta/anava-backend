@@ -141,6 +141,10 @@ function initial() {
             new Event({
               name: "OSM",
               stages: stages,
+              price: 50000,
+              "contact_person.name": "Nur Indah Setyaningsih",
+              "contact_person.phone_number": "082137793955",
+              logo: 'osm.png'
             }).save((err, event) => {
               if (err) {
                 console.log("error", err);
@@ -159,7 +163,7 @@ function initial() {
                 }
 
                 stages2.push(stage._id);
-                console.log("Preliminary Stage of Ranking 1 added successfuly");
+                console.log("Preliminary Stage of The One added successfuly");
 
                 new Stage({
                   name: "semifinal",
@@ -170,7 +174,7 @@ function initial() {
                   }
 
                   stages2.push(stage._id);
-                  console.log("Semifinal Stage of Ranking 1 added successfuly");
+                  console.log("Semifinal Stage of The One added successfuly");
 
                   new Stage({
                     name: "final",
@@ -181,17 +185,22 @@ function initial() {
                     }
 
                     stages2.push(stage._id);
-                    console.log("Final Stage of Ranking 1 added successfuly");
+                    console.log("Final Stage of The One added successfuly");
 
                     new Event({
-                      name: "Ranking 1",
+                      name: "The One",
                       stages: stages2,
+                      "contact_person.name": "Ratna Tri Ningsih",
+                      "contact_person.phone_number": "085865645692",
+                      price: 20000,
+                      logo: 'the-one.png'
+
                     }).save((err, event) => {
                       if (err) {
                         console.log("error", err);
                       }
 
-                      console.log("Ranking 1 added successfuly");
+                      console.log("The One added successfuly");
 
                       var stages3 = [];
 
@@ -203,7 +212,7 @@ function initial() {
                         }
 
                         stages3.push(stage._id);
-                        console.log("Preliminary of Poster added successfuly");
+                        console.log("Preliminary of Started added successfuly");
 
                         new Stage({
                           name: "final",
@@ -213,18 +222,85 @@ function initial() {
                           }
 
                           stages3.push(stage._id);
-                          console.log("Final of Poster added successfuly");
+                          console.log("Final of Started added successfuly");
 
                           new Event({
-                            name: "Poster",
-                            stages: stages,
+                            name: "Started",
+                            stages: stages3,
                             participants: [],
+                            "contact_person.name": "Tara Dwipa A. T.",
+                            "contact_person.phone_number": "085869502968",
+                            price: 20000,
+                            logo: 'started.png'
                           }).save((err, event) => {
                             if (err) {
                               console.log("error", err);
                             }
 
-                            console.log("Poster added successfuly");
+                            console.log("Started added successfuly");
+
+                            var stages4 = [];
+
+                            new Stage({
+                              name: "preliminary",
+                            }).save((err, stage) => {
+                              if (err) {
+                                console.log("error", err);
+                              }
+
+                              stages4.push(stage._id);
+                              console.log(
+                                "preliminary of Sigma added successfuly"
+                              );
+
+                              new Event({
+                                name: "Sigma",
+                                stages: stages4,
+                                participants: [],
+                                "contact_person.name": "Nisa Dwi Damayanti",
+                                "contact_person.phone_number": "081391074047",
+                                price: 20000,
+                                logo: 'sigma.png'
+                              }).save((err, event) => {
+                                if (err) {
+                                  console.log("error", err);
+                                }
+
+                                var stages5 = [];
+
+                                console.log("Sigma added successfuly");
+
+                                new Stage({
+                                  name: "preliminary",
+                                }).save((err, stage) => {
+                                  if (err) {
+                                    console.log("error", err);
+                                  }
+
+                                  stages5.push(stage._id);
+                                  console.log(
+                                    "preliminary of Open House added successfuly"
+                                  );
+
+                                  new Event({
+                                    name: "Open House",
+                                    stages: stages5,
+                                    participants: [],
+                                    "contact_person.name": "Cicilia Debbie S.",
+                                    "contact_person.phone_number":
+                                      "081351366118",
+                                    price: 20000,
+                                    logo: 'open-house.png'
+                                  }).save((err, event) => {
+                                    if (err) {
+                                      console.log("error", err);
+                                    }
+
+                                    console.log("Open House added successfuly");
+                                  });
+                                });
+                              });
+                            });
                           });
                         });
                       });

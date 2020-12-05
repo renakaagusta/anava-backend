@@ -10,13 +10,10 @@ var path = require("path");
 var id = "";
 
 const storage = multer.diskStorage({
-  destination: path.join(__dirname + "./../../voting-frontend/public/"),
+  destination: path.join(__dirname + "./../../../anava-frontend/public/"),
   filename: function (req, file, cb) {
-    if (path.extname(file.originalname) != ".pdf") {
-      cb(null, id + ".jpg");
-    } else {
-      cb(null, id + ".pdf");
-    }
+    console.log(req.body.type + req.params.id);
+    cb(null, req.body.type + "_" + req.params.id + ".jpg");
   },
 });
 
@@ -91,20 +88,30 @@ exports.update = function (req, res) {
   if (req.body.password) participant.username = req.body.password;
   if (req.body.firstname) participant.firstname = req.body.firstname;
   if (req.body.lastname) participant.lastname = req.body.lastname;
+  if (req.body.birthDate)
+    participant["participant.birth_date"] = new Date(req.body.birthDate);
+  if (req.body.grade) participant["participant.grade"] = req.body.grade;
+  if (req.body.address) participant["participant.address"] = req.body.address;
+  if (req.body.phoneNumber)
+    participant["participant.phone_number"] = req.body.phoneNumber;
   if (req.body.schoolName)
     participant["participant.school.name"] = req.body.schoolName;
   if (req.body.schoolAddress)
     participant["participant.school.address"] = req.body.schoolAddress;
+  if (req.body.region) participant["participant.region"] = req.body.region;
   participant.updated_at = Date.now();
   Participant.findOneAndUpdate(
     { _id: id },
     { $set: participant },
+    { new: true },
     (err, participant) => {
       console.log(err);
-        if (err) return res.status(400).send(err);
+      console.log(participant)
+      console.log(req.body);
+      if (err) return res.status(400).send(err);
 
       return res.json({
-        message: "participant updated",
+        message: "Data berhasil diperbarui",
         data: participant,
       });
     }
@@ -150,7 +157,9 @@ exports.verify = function (req, res) {
 exports.upload = function (req, res) {
   id = req.params.id;
   upload(req, res, (err) => {
-    if (err) throw err;
+    if (err) return res.status(500).send(err);
+
+    const type = req.body.type;
 
     if (type == "image_profile") {
       Participant.findOneAndUpdate(
@@ -160,7 +169,8 @@ exports.upload = function (req, res) {
             image: "img_" + id,
             updated_at: Date.now(),
           },
-        }
+        },
+        { new: true}
       )
         .then((participant) => {
           if (participant) {
@@ -187,10 +197,11 @@ exports.upload = function (req, res) {
         { _id: id },
         {
           $set: {
-            "participant.document.image.status": 1,
+            "participant.document.image": 1,
             updated_at: Date.now(),
           },
-        }
+        },
+        { new: true}
       )
         .then((participant) => {
           if (participant) {
@@ -217,10 +228,11 @@ exports.upload = function (req, res) {
         { _id: id },
         {
           $set: {
-            "participant.document.osis_card.status": 1,
+            "participant.document.osis_card": 1,
             updated_at: Date.now(),
           },
-        }
+        },
+        { new: true}
       )
         .then((participant) => {
           if (participant) {
@@ -250,7 +262,8 @@ exports.upload = function (req, res) {
             "participant.payment.status": 1,
             updated_at: Date.now(),
           },
-        }
+        },
+        { new: true}
       )
         .then((participant) => {
           if (participant) {

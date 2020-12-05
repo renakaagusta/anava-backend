@@ -8,11 +8,11 @@ const User = mongoose.model(
     email: String,
     firstname: {
       type: String,
-      default: "first",
+      default: "",
     },
     lastname: {
       type: String,
-      default: "last",
+      default: "",
     },
     image: {
       type: String,
@@ -35,6 +35,22 @@ const User = mongoose.model(
       },
     },
     participant: {
+      grade: {
+        type: Number,
+        default: 10,
+      },
+      birth_date: {
+        type: Date,
+        default: "",
+      },
+      address: {
+        type: String,
+        default: "",
+      },
+      phone_number: {
+        type: String,
+        default: "",
+      },
       location: {
         subdistrict: {
           type: String,
@@ -49,23 +65,27 @@ const User = mongoose.model(
           default: "",
         },
       },
+      region: {
+        type: Number,
+        default: 1,
+      },
       school: {
         name: {
           type: String,
-          default: "SMA",
+          default: "",
         },
         address: {
           type: String,
-          default: "SMA",
+          default: "",
         },
       },
       document: {
         image: {
-          status: Number,
+          type: Number,
           default: 0,
         },
         osis_card: {
-          status: Number,
+          type: Number,
           default: 0,
         },
       },
@@ -78,6 +98,14 @@ const User = mongoose.model(
           name: {
             type: String,
             default: "",
+          },
+          number: {
+            type: String,
+            default: "",
+          },
+          paymentStatus: {
+            type: Number,
+            default: 0,
           },
           stages: [
             {
@@ -103,6 +131,9 @@ const User = mongoose.model(
               },
             },
           ],
+          pay_at: {
+            type: Date,
+          },
           created_at: {
             type: Date,
             default: Date.now(),

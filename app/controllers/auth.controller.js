@@ -266,7 +266,8 @@ exports.signup = (req, res) => {
               };
 
               transporter.sendMail(mailOptions, (err, info) => {
-                if (err) throw err;
+                console.log(err);
+                if (err) return res.status(500).json(err);
 
                 res.send({ message: "User was registered successfully!" });
                 return;
@@ -315,6 +316,7 @@ exports.signup = (req, res) => {
             };
 
             transporter.sendMail(mailOptions, (err, info) => {
+              console.log(err);
               if (err) throw err;
 
               return res.send({
@@ -340,7 +342,7 @@ exports.signin = (req, res) => {
       }
 
       if (!user) {
-        return res.status(404).send({ message: "User Not found." });
+        return res.status(404).send({ message: "Pengguna tidak ditemukan" });
       }
 
       var passwordIsValid = bcrypt.compareSync(
@@ -351,7 +353,7 @@ exports.signin = (req, res) => {
       if (!passwordIsValid) {
         return res.status(401).send({
           accessToken: null,
-          message: "Invalid Password!",
+          message: "Pengguna tidak ditemukan",
         });
       }
 
@@ -410,6 +412,7 @@ exports.findByEmail = (req, res) => {
 };
 
 exports.confirmEmail = (req, res) => {
+  console.log(req.params.id)
   User.findOneAndUpdate(
     {
       _id: req.params.id,
@@ -419,14 +422,15 @@ exports.confirmEmail = (req, res) => {
         verification: 1,
       },
     },
+    { new: true },
     (err, user) => {
-      if (err) throw err;
+      if (err) return res.status(500).send(err);
 
-      console.log(JSON.stringify(user._id));
+      console.log(user)
 
       return res.json({
         status: "success",
-        message: "Mail confirmation successfully",
+        message: "Email berhasil dikonfirmasi",
         data: user,
       });
     }
@@ -632,12 +636,12 @@ exports.requestChangePassword = (req, res) => {
             if (err) throw err;
 
             return res.send({
-              message: "Change password request send successfully!",
+              message: "Permintaan ganti sandi berhasil dikirim ke email",
             });
           });
         } else {
           return res.send({
-            message: "User not found",
+            message: "Pengguna tidak ditemukan",
           });
         }
       }

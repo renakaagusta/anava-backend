@@ -13,4 +13,6 @@ module.exports = function(app) {
   app.get("/api/event/all", [authJwt.verifyToken], controller.index);
   app.get("/api/event/:id", [authJwt.verifyToken], controller.view);
   app.put("/api/event/:id", [authJwt.verifyToken, authJwt.isAdmin], controller.update);
+  app.put("/api/event/:id/add", [authJwt.verifyToken], controller.add);
+
 };

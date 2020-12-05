@@ -1,6 +1,7 @@
 // Import Payment model
 const db = require("../models");
 var nodemailer = require("nodemailer");
+
 const Payment = db.payment;
 const Participant = db.user;
 const Admin = db.user;
@@ -25,7 +26,9 @@ exports.index = async function (req, res) {
 
             payments[index].participant = participant;
 
-            if (payments.length == index + 1) {
+            index++;
+
+            if (payments.length == index) {
               console.log("1");
               index = 0;
               await Promise.all(
@@ -35,41 +38,27 @@ exports.index = async function (req, res) {
                     async function (err, event) {
                       if (err) return res.status(400).send(err);
 
+                      console.log(index);
+
+                      console.log(event);
+
                       payments[index].event = event;
 
-                      if (payments.length == index + 1) {
-                        console.log("2");
-                        index = 0;
-                        await Promise.all(
-                          payments.map(async (payment) => {
-                            await Admin.findById(
-                              payment.verified_by,
-                              async function (err, admin) {
-                                if (err) return res.status(400).send(err);
-
-                                payments[index].verified_by = admin;
-
-                                if (payments.length == index + 1) {
-                                  return res.json({
-                                    status: "success",
-                                    message: "Payment Added Successfully",
-                                    data: payments,
-                                  });
-                                }
-                                index++;
-                              }
-                            );
-                          })
-                        );
-                      }
                       index++;
+
+                      if (payments.length == index) {
+
+                        return res.json({
+                          status: "success",
+                          message: "Payment Added Successfully",
+                          data: payments,
+                        });
+                      }
                     }
                   );
                 })
               );
             }
-
-            index++;
           }
         );
       })
@@ -86,12 +75,26 @@ exports.indexByParticipant = function (req, res) {
       participant: req.params.participantId,
     },
     function (err, payments) {
-      if (err) return res.send(err);
+      if (err) return res.status(400).send(err);
 
-      return res.json({
-        status: "success",
-        message: "Payment Added Successfully",
-        data: payments,
+      var index = 0;
+
+      payments.forEach((payment) => {
+        Event.findById(payment.event, (err, event) => {
+          if (err) res.status(400).send(err);
+
+          payments[index].event = event;
+          index++;
+
+          if (index == payments.length) {
+            console.log(payments);
+            return res.json({
+              status: "success",
+              message: "Payment Added Successfully",
+              data: payments,
+            });
+          }
+        });
       });
     }
   );
@@ -105,13 +108,61 @@ exports.create = async function (req, res) {
     payment.verified_by = req.body.adminId;
     payment.event = event._id;
 
-    // Save and validate
-    await payment.save(function (err) {
-      if (err) return res.json(err);
-    });
-  });
+    await Payment.find(
+      {
+        event: event._id,
+      },
+      async function (err, payments) {
+        if (err) return res.status(500).send(err);
 
-  console.log(req.body.participantId);
+        var totalPayment = payments.length;
+
+        await payment.save(async function (err) {
+          if (err) return res.status(500).json(err);
+
+          var index = 0;
+
+          await Participant.findOne(
+            { _id: req.body.participantId },
+            async function (err, participant) {
+              if (err) res.status(400).send(err);
+
+              var participantNumber = "15";
+
+              if (event.name == "OSM") {
+                participantNumber += participant.participant.region.toString();
+              } else if (event.name == "The One") {
+                participantNumber += "6";
+              } else if (event.name == "Started") {
+                participantNumber += "7";
+              } else if (event.name == "Sigma") {
+                participantNumber += "8";
+              } else if (event.name == "Started") {
+                participantNumber += "9";
+              }
+
+              participantNumber += "00";
+
+              totalPayment++;
+              participantNumber += totalPayment.toString();
+
+              participant.participant.events.forEach((_event) => {
+                if (_event.id == event._id)
+                  participant.participant.events[index].paymentStatus = 1;
+                  participant.participant.events[index].number = participantNumber;
+                index++;
+              });
+
+              participant.save(function (err) {
+                console.log(err);
+                if (err) return res.status(500).json(err);
+              });
+            }
+          );
+        });
+      }
+    );
+  });
 
   await Mail.findOne({}, async function (err, mail) {
     if (err) return res.status(500).send({ message: err });
@@ -119,8 +170,8 @@ exports.create = async function (req, res) {
     var email = mail.email;
     var password = email.password;
 
-    await Participant.findById(
-      req.body.participantId,
+    await Participant.findOne(
+      { _id: req.body.participantId },
       async function (err, participant) {
         if (err) res.status(400).send(err);
 

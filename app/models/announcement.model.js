@@ -7,6 +7,14 @@ const Announcement = mongoose.model(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Admin"
     },
+    stage: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Stage"
+    },
+    participant: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Participant"
+    },
     title: String,
     content: String,
     created_at: {
