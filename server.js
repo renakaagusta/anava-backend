@@ -6,11 +6,10 @@ var logger = require("morgan");
 
 const app = express();
 
-var corsOptions = {
-  origin: "http://localhost:8080",
-};
-
+//cors
 app.use(cors());
+app.options('*', cors());
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(logger("dev"));
