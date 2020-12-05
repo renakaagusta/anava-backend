@@ -9,7 +9,7 @@ var path = require("path");
 
 const storage = multer.diskStorage({
   destination: path.join(
-    __dirname + "./../../../anava-frontend/public/pakta integritas/"
+    __dirname + "./../../../"
   ),
   filename: function (req, file, cb) {
     cb(null, req.body.stageId + '_' + req.body.participantId + '.pdf');

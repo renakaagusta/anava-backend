@@ -10,7 +10,7 @@ var path = require("path");
 var id = "";
 
 const storage = multer.diskStorage({
-  destination: path.join(__dirname + "./../../../anava-frontend/public/"),
+  destination: path.join(__dirname + "./../../../"),
   filename: function (req, file, cb) {
     console.log(req.body.type + req.params.id);
     cb(null, req.body.type + "_" + req.params.id + ".jpg");
