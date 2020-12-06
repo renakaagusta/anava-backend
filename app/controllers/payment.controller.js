@@ -147,9 +147,11 @@ exports.create = async function (req, res) {
               participantNumber += totalPayment.toString();
 
               participant.participant.events.forEach((_event) => {
-                if (_event.id == event._id)
+                if (_event.id == event._id) {
+                  participant.participant.events[index].pay_at = new Date();
                   participant.participant.events[index].paymentStatus = 1;
                   participant.participant.events[index].number = participantNumber;
+                }
                 index++;
               });
 
