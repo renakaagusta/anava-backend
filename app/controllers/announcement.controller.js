@@ -134,16 +134,37 @@ exports.view = function (req, res) {
   Announcement.findById(req.params.id, function (err, announcement) {
     if (err) return res.send(err);
 
-    Admin.findById(announcement.admin, function (err, admin) {
-      if (err) return res.status(400).send(err);
+    if (announcement.participant) {
+      Participant.findById(
+        announcement.participant,
+        function (err, participant) {
+          if (err) return res.status(400).send(err);
 
-      announcement.admin = admin;
+          announcement.participant = participant;
 
+          return res.json({
+            message: "announcements Detail Loading...",
+            data: announcement,
+          });
+        }
+      );
+    } else if (announcement.stage) {
+      Stage.findById(announcement.stage, function (err, stage) {
+        if (err) return res.status(400).send(err);
+
+        announcement.stage = stage;
+
+        return res.json({
+          message: "announcements Detail Loading...",
+          data: announcement,
+        });
+      });
+    } else {
       return res.json({
         message: "announcements Detail Loading...",
         data: announcement,
       });
-    });
+    }
   });
 };
 
