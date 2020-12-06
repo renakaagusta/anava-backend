@@ -11,6 +11,7 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
     }
 
     if (user) {
+      console.log(user)
       return res.status(400).send({ message: "Username tersebut telah digunakan" });
     }
 
@@ -22,9 +23,8 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
       if (err) {
         return res.status(500).send({ message: err });
       }
-      console.log("oke")
       if (user) {
-        console.log("error disini")
+        console.log(user)
         return res.status(400).send({ message: "Email tersebut telah digunakan" });
       }
       console.log("oke2")

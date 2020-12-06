@@ -88,7 +88,10 @@ function initial() {
 
   Mail.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
-      new Mail({}).save((err) => {
+      new Mail({
+        email: 'anava.mipa.ugm@gmail.com',
+        password: 'bersatu1'
+      }).save((err) => {
         if (err) {
           console.log("error", err);
         }
@@ -140,7 +143,7 @@ function initial() {
             new Event({
               name: "OSM",
               stages: stages,
-              price: 50000,
+              price: 35000,
               "contact_person.name": "Nur Indah Setyaningsih",
               "contact_person.phone_number": "082137793955",
               logo: 'osm.png'
@@ -191,7 +194,7 @@ function initial() {
                       stages: stages2,
                       "contact_person.name": "Ratna Tri Ningsih",
                       "contact_person.phone_number": "085865645692",
-                      price: 20000,
+                      price: 45000,
                       logo: 'the-one.png'
 
                     }).save((err, event) => {
@@ -229,7 +232,7 @@ function initial() {
                             participants: [],
                             "contact_person.name": "Tara Dwipa A. T.",
                             "contact_person.phone_number": "085869502968",
-                            price: 20000,
+                            price: 35000,
                             logo: 'started.png'
                           }).save((err, event) => {
                             if (err) {
@@ -258,7 +261,7 @@ function initial() {
                                 participants: [],
                                 "contact_person.name": "Nisa Dwi Damayanti",
                                 "contact_person.phone_number": "081391074047",
-                                price: 20000,
+                                price: 5000,
                                 logo: 'sigma.png'
                               }).save((err, event) => {
                                 if (err) {
@@ -288,7 +291,7 @@ function initial() {
                                     "contact_person.name": "Cicilia Debbie S.",
                                     "contact_person.phone_number":
                                       "081351366118",
-                                    price: 20000,
+                                    price: 0,
                                     logo: 'open-house.png'
                                   }).save((err, event) => {
                                     if (err) {
