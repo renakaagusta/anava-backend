@@ -6,7 +6,7 @@ const Event = db.event;
 const Role = db.role;
 const Mail = db.mail;
 
-var url = "http://localhost:8080/";
+var url = "http://anavaugm.com/";
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
@@ -178,7 +178,7 @@ exports.signup = (req, res) => {
       mailBodyForVerification +=
         '                        <td bgcolor="#ffffff" align="center" valign="top" style="padding: 40px 20px 20px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: \'Lato\', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 4px; line-height: 48px;">';
       mailBodyForVerification +=
-        '                            <h1 style="font-size: 48px; font-weight: 400; margin: 2;">Welcome!</h1> <img src=" https://img.icons8.com/clouds/100/000000/handshake.png" width="125" height="120" style="display: block; border: 0px;" />';
+        '                            <h1 style="font-size: 48px; font-weight: 400; margin: 2;">Halo!</h1> <img src="http://anavaugm.com/logo-anava.png" width="125" height="120" style="display: block; border: 0px;" />';
       mailBodyForVerification += "                        </td>";
       mailBodyForVerification += "                    </tr>";
       mailBodyForVerification += "                </table>";
@@ -193,7 +193,7 @@ exports.signup = (req, res) => {
       mailBodyForVerification +=
         '                        <td bgcolor="#ffffff" align="left" style="padding: 20px 30px 40px 30px; color: #666666; font-family: \'Lato\', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">';
       mailBodyForVerification +=
-        '                            <p style="margin: 0;">Selamat datang di ANAVA 2020 Renaka Agusta, sebelum mengikuti segala event ANAVA silahkan melakukan konfirmasi email akun anda dengan menekan tombol konfirmasi di bawah.</p>';
+        '                            <p style="margin: 0;">Selamat datang di ANAVA 15 Renaka Agusta, sebelum mengikuti event-event ANAVA silahkan melakukan konfirmasi email akun anda dengan menekan tombol konfirmasi di bawah.</p>';
       mailBodyForVerification += "                        </td>";
       mailBodyForVerification += "                    </tr>";
       mailBodyForVerification += "                    <tr>";
@@ -317,7 +317,8 @@ exports.signup = (req, res) => {
 
             transporter.sendMail(mailOptions, (err, info) => {
               console.log(err);
-              if (err) throw err;
+              console.log(info);
+              if (err) return res.status(500).send(err);
 
               return res.send({
                 message: "User was registered successfully!",
@@ -331,9 +332,21 @@ exports.signup = (req, res) => {
 };
 
 exports.signin = (req, res) => {
-  User.findOne({
-    username: req.body.username,
-  })
+  var filter = {};
+  if (
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+      req.body.username
+    )
+  )
+    filter = {
+      email: req.body.username,
+    };
+  else
+    filter = {
+      username: req.body.username,
+    };
+
+  User.findOne(filter)
     .populate("roles", "-__v")
     .exec((err, user) => {
       if (err) {
@@ -412,7 +425,7 @@ exports.findByEmail = (req, res) => {
 };
 
 exports.confirmEmail = (req, res) => {
-  console.log(req.params.id)
+  console.log(req.params.id);
   User.findOneAndUpdate(
     {
       _id: req.params.id,
@@ -426,7 +439,7 @@ exports.confirmEmail = (req, res) => {
     (err, user) => {
       if (err) return res.status(500).send(err);
 
-      console.log(user)
+      console.log(user);
 
       return res.json({
         status: "success",
@@ -577,7 +590,7 @@ exports.requestChangePassword = (req, res) => {
             '                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">' +
             "                    <tr>" +
             '                        <td bgcolor="#ffffff" align="center" valign="top" style="padding: 40px 20px 20px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: \'Lato\', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 4px; line-height: 48px;">' +
-            '                            <h1 style="font-size: 48px; font-weight: 400; margin: 2;">Ganti sandi</h1> <img src=" https://img.icons8.com/clouds/100/000000/handshake.png" width="125" height="120" style="display: block; border: 0px;" />' +
+            '                            <h1 style="font-size: 48px; font-weight: 400; margin: 2;">Ganti sandi</h1> <img src="http://anavaugm.com/logo-anava.png" width="125" height="120" style="display: block; border: 0px;" />' +
             "                        </td>" +
             "                    </tr>" +
             "                </table>" +
@@ -598,7 +611,7 @@ exports.requestChangePassword = (req, res) => {
             '                                    <td bgcolor="#ffffff" align="center" style="padding: 20px 30px 60px 30px;">' +
             '                                        <table border="0" cellspacing="0" cellpadding="0">' +
             "                                            <tr>" +
-            '                                                <td align="center" style="border-radius: 3px;" bgcolor="#746cc0"><a href="http://localhost:8080/change-password/' +
+            '                                                <td align="center" style="border-radius: 3px;" bgcolor="#746cc0"><a href="http://anavaugm.com/change-password/' +
             user._id +
             '" target="_blank" style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; padding: 15px 25px; border-radius: 2px; display: inline-block;">Ganti</a></td>' +
             "                                            </tr>" +

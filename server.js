@@ -88,7 +88,10 @@ function initial() {
 
   Mail.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
-      new Mail({}).save((err) => {
+      new Mail({
+        email: 'anava.mipa.ugm@gmail.com',
+        password: 'bersatu1'
+      }).save((err) => {
         if (err) {
           console.log("error", err);
         }
