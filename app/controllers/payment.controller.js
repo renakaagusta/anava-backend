@@ -148,6 +148,7 @@ exports.create = async function (req, res) {
 
               participant.participant.events.forEach((_event) => {
                 if (_event.id == event._id) {
+                  console.log("event pay: "+event.name);
                   participant.participant.events[index].pay_at = new Date();
                   participant.participant.events[index].paymentStatus = 1;
                   participant.participant.events[index].number = participantNumber;
