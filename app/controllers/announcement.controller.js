@@ -17,6 +17,8 @@ exports.index = function (req, res) {
 
     var index = 0;
 
+    announcements = JSON.parse(JSON.stringify(announcements));
+
     announcements.forEach((announcement) => {
       if (announcement.participant != null) {
         Participant.findById(announcement.participant, (err, participant) => {
@@ -85,22 +87,16 @@ exports.indexGeneral = function (req, res) {
 
 // Handle view actions
 exports.indexByStage = function (req, res) {
-  Announcement.findById(
+  Announcement.find(
     {
-      stage: req.params.stageId,
+      stage: req.params.id,
     },
-    function (err, announcement) {
+    function (err, announcements) {
       if (err) return res.send(err);
 
-      Admin.findById(announcement.admin, function (err, admin) {
-        if (err) return res.status(400).send(err);
-
-        announcement.admin = admin;
-
-        return res.json({
-          message: "announcements Detail Loading...",
-          data: announcement,
-        });
+      return res.json({
+        message: "announcements Detail Loading...",
+        data: announcements,
       });
     }
   );
@@ -108,22 +104,16 @@ exports.indexByStage = function (req, res) {
 
 // Handle view actions
 exports.indexByParticipant = function (req, res) {
-  Announcement.findById(
+  Announcement.find(
     {
-      participant: req.params.participantId,
+      participant: req.params.id,
     },
-    function (err, announcement) {
+    function (err, announcements) {
       if (err) return res.send(err);
 
-      Admin.findById(announcement.admin, function (err, admin) {
-        if (err) return res.status(400).send(err);
-
-        announcement.admin = admin;
-
-        return res.json({
-          message: "announcements Detail Loading...",
-          data: announcement,
-        });
+      return res.json({
+        message: "announcements Detail Loading...",
+        data: announcements,
       });
     }
   );
@@ -134,7 +124,9 @@ exports.view = function (req, res) {
   Announcement.findById(req.params.id, function (err, announcement) {
     if (err) return res.send(err);
 
-    if (announcement.participant) {
+    announcement = JSON.parse(JSON.stringify(announcement));
+
+    if (announcement.participant != null) {
       Participant.findById(
         announcement.participant,
         function (err, participant) {
@@ -148,7 +140,7 @@ exports.view = function (req, res) {
           });
         }
       );
-    } else if (announcement.stage) {
+    } else if (announcement.stage != null) {
       Stage.findById(announcement.stage, function (err, stage) {
         if (err) return res.status(400).send(err);
 
