@@ -22,7 +22,7 @@ exports.index = function (req, res) {
         Participant.findById(announcement.participant, (err, participant) => {
           if (err) return res.status(500).send(err);
 
-          announcemens[index].participant = participant;
+          announcements[index].participant = participant;
           index++;
 
           if (index == announcements.length)
@@ -36,7 +36,7 @@ exports.index = function (req, res) {
         Stage.findById(announcement.stage, (err, stage) => {
           if (err) return res.status(500).send(err);
 
-          announcemens[index].stage = stage;
+          announcements[index].stage = stage;
           index++;
 
           if (index == announcements.length)
