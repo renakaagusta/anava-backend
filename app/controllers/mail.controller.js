@@ -25,7 +25,7 @@ exports.update = function (req, res) {
     Mail.findOneAndUpdate(
         {},
         {$set: {
-            username: req.body.username,
+            email: req.body.email,
             password: req.body.password,
         }})
     .then((mail)=>{

@@ -6,7 +6,7 @@ const Event = db.event;
 const Role = db.role;
 const Mail = db.mail;
 
-var url = "http://anavaugm.com/";
+var url = "http://localhost:8080/";
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
@@ -598,7 +598,7 @@ exports.requestChangePassword = (req, res) => {
             '                                    <td bgcolor="#ffffff" align="center" style="padding: 20px 30px 60px 30px;">' +
             '                                        <table border="0" cellspacing="0" cellpadding="0">' +
             "                                            <tr>" +
-            '                                                <td align="center" style="border-radius: 3px;" bgcolor="#746cc0"><a href="http://anavaugm.com/change-password/' +
+            '                                                <td align="center" style="border-radius: 3px;" bgcolor="#746cc0"><a href="http://localhost:8080/change-password/' +
             user._id +
             '" target="_blank" style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; padding: 15px 25px; border-radius: 2px; display: inline-block;">Ganti</a></td>' +
             "                                            </tr>" +
