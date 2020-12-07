@@ -132,9 +132,9 @@ exports.create = async function (req, res) {
               if (event.name == "OSM") {
                 participantNumber += participant.participant.region.toString();
               } else if (event.name == "The One") {
-                participantNumber += "6";
-              } else if (event.name == "Started") {
                 participantNumber += "7";
+              } else if (event.name == "Started") {
+                participantNumber += "6";
               } else if (event.name == "Sigma") {
                 participantNumber += "8";
               } else if (event.name == "Started") {
