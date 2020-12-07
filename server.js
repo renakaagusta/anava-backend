@@ -143,7 +143,7 @@ function initial() {
             new Event({
               name: "OSM",
               stages: stages,
-              price: 35000,
+              price: 50000,
               "contact_person.name": "Nur Indah Setyaningsih",
               "contact_person.phone_number": "082137793955",
               logo: 'osm.png'
