@@ -57,20 +57,18 @@ exports.view = function (req, res) {
 
 // Handle create actions
 exports.create = async function (req, res) {
-  upload(req, res, err => {
-    if (err) return res.status(400).send(err);
-
-  });
-
+  console.log(req.body);
   await AnswerForm({
     stage: req.body.stageId,
     participant: req.body.participantId,
     answers: req.body.answers ? req.body.answers : [],
   }).save(async (err, answerForm) => {
-    if (err) return res.json(err);
+    if (err) return res.status(400).json(err);
 
     await Stage.findById(req.body.stageId, async function (err, stage) {
       if (err) return res.status(400).send(err);
+
+      console.log(req.body)
 
       await Stage.update(
         { _id: req.body.stageId },
@@ -134,6 +132,7 @@ exports.create = async function (req, res) {
                       answerForm.save(async function (err, answerForm) {
                         console.log("answerform err");
                         console.log(err);
+                        console.log(answerForm);
                         if (err) return res.status(400).json(err);
 
                         return res.json({
