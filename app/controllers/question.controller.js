@@ -50,6 +50,7 @@ exports.create = function (req, res) {
     key: req.body.key ? req.body.key : "",
     price: req.body.price ? req.body.price : 0,
     time: req.body.time ? req.body.time : 0,
+    session: req.body.session ? req.body.session : 1,
     options: req.body.options ? req.body.options : [],
   }).save((err, question) => {
     if (err) return res.json(err);
@@ -111,6 +112,7 @@ exports.update = function (req, res) {
         key: req.body.key ? req.body.key : "",
         price: req.body.price ? req.body.price : 0,
         time: req.body.time ? req.body.time : 0,
+        session: req.body.session ? req.body.session : 1,
         options: req.body.options ? req.body.options : [],
         updatedAt: Date.now(),
       },
