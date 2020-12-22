@@ -4,6 +4,22 @@ const Event = db.event;
 const Stage = db.stage;
 const Participant = db.user;
 
+var multer = require("multer");
+var path = require("path");
+
+var id = "";
+
+const storage = multer.diskStorage({
+  destination: path.join(__dirname + "./../../../"),
+  filename: function (req, file, cb) {
+    cb(null, "event_document_" + req.params.id + ".jpg");
+  },
+});
+
+const upload = multer({
+  storage: storage,
+}).single("file");
+
 // Handle index actions
 exports.index = async function (req, res) {
   var n = 0;
@@ -116,6 +132,37 @@ exports.update = function (req, res) {
         data: err,
       });
     });
+};
+
+// Handle upload actions
+exports.upload = function (req, res) {
+  var id = req.params.id;
+  upload(req, res, (err) => {
+    if (err) return res.status(500).send(err);
+
+    Participant.findOne({ _id: req.body.participantId }, (err, participant) => {
+      if (err) return res.status(500).send(err);
+
+      var index = 0;
+
+      participant.participant.events.forEach((event) => {
+        if (event.id == id) {
+          participant.participant.events[index].document = 1;
+        }
+
+        index++;
+      });
+
+      participant.save((err, participant) => {
+        if (err) return res.status(500).send(err);
+
+        return res.json({
+          message: "participant updated",
+          data: participant,
+        });
+      });
+    });
+  });
 };
 
 // Handle add participant actions
@@ -232,7 +279,7 @@ exports.add = async function (req, res) {
                         _participant.save((err, participant) => {
                           if (err) return res.status(400).send(err);
 
-                          console.log(_participant)
+                          console.log(_participant);
 
                           console.log(participant);
 

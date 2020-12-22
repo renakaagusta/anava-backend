@@ -1,5 +1,6 @@
 const db = require("../models");
 const AnswerForm = db.answerForm;
+const Participant = db.user;
 const Stage = db.stage;
 const Question = db.question;
 const Answer = db.answer;
@@ -8,11 +9,9 @@ var multer = require("multer");
 var path = require("path");
 
 const storage = multer.diskStorage({
-  destination: path.join(
-    __dirname + "./../../../"
-  ),
+  destination: path.join(__dirname + "./../../../"),
   filename: function (req, file, cb) {
-    cb(null, req.body.stageId + '_' + req.body.participantId + '.pdf');
+    cb(null, req.body.stageId + "_" + req.body.participantId + ".pdf");
   },
 });
 
@@ -57,101 +56,183 @@ exports.view = function (req, res) {
 
 // Handle create actions
 exports.create = async function (req, res) {
-  console.log(req.body);
-  await AnswerForm({
-    stage: req.body.stageId,
-    participant: req.body.participantId,
-    answers: req.body.answers ? req.body.answers : [],
-  }).save(async (err, answerForm) => {
-    if (err) return res.status(400).json(err);
+  await Participant.find(
+    {
+      _id: req.body.participantId,
+    },
+    async function (err, participant) {
+      if (err) return res.status(500).json(err);
 
-    await Stage.findById(req.body.stageId, async function (err, stage) {
-      if (err) return res.status(400).send(err);
+      participant = JSON.parse(JSON.stringify(participant[0]));
 
-      console.log(req.body)
+      var session = 1;
 
-      await Stage.update(
-        { _id: req.body.stageId },
-        {
-          $addToSet: {
-            answer_forms: answerForm._id,
-          },
-        },
-        { safe: true, upsert: true },
-        async function (err, stage) {
-          if (err) return res.status(400).json(err);
+      participant.participant.events.forEach((event) => {
+        if (event.stages.includes(req.body.stageId)) {
+          event.stages.forEach((stage) => {
+            if (stage.id == req.body.stageId) {
+              session = stage.session;
+            }
+          });
+        }
+      });
 
-          await Question.find(
+      await AnswerForm({
+        stage: req.body.stageId,
+        participant: req.body.participantId,
+        answers: req.body.answers ? req.body.answers : [],
+      }).save(async (err, answerForm) => {
+        if (err) return res.status(400).json(err);
+
+        await Stage.findById(req.body.stageId, async function (err, stage) {
+          if (err) return res.status(400).send(err);
+
+          await Stage.update(
+            { _id: req.body.stageId },
             {
-              stage: req.body.stageId,
+              $addToSet: {
+                answer_forms: answerForm._id,
+              },
             },
-            async function (err, questions) {
-              if (err) return res.status(400).send(err);
+            { safe: true, upsert: true },
+            async function (err, stage) {
+              if (err) return res.status(400).json(err);
 
-              var currentIndex = questions.length,
-                temporaryValue,
-                randomIndex;
+              await Question.find(
+                {
+                  stage: req.body.stageId,
+                  session: session,
+                },
+                async function (err, questions) {
+                  console.log("question");
+                  console.log(err);
+                  console.log(session);
+                  console.log(req.body.stageId);
+                  console.log(questions);
+                  if (err) return res.status(400).send(err);
 
-              // While there remain elements to shuffle...
-              while (0 !== currentIndex) {
-                // Pick a remaining element...
-                randomIndex = Math.floor(Math.random() * currentIndex);
-                currentIndex -= 1;
+                  var currentIndex = questions.length,
+                    temporaryValue,
+                    randomIndex;
 
-                // And swap it with the current element.
-                temporaryValue = questions[currentIndex];
-                questions[currentIndex] = questions[randomIndex];
-                questions[randomIndex] = temporaryValue;
-              }
+                  // While there remain elements to shuffle...
+                  while (0 !== currentIndex) {
+                    // Pick a remaining element...
+                    randomIndex = Math.floor(Math.random() * currentIndex);
+                    currentIndex -= 1;
 
-              var questions_id = [];
-              questions.forEach((question) => {
-                questions_id.push(question._id.toHexString());
-              });
+                    // And swap it with the current element.
+                    temporaryValue = questions[currentIndex];
+                    questions[currentIndex] = questions[randomIndex];
+                    questions[randomIndex] = temporaryValue;
+                  }
 
-              var answers = [];
-              await Promise.all(
-                questions.map(async (question) => {
-                  await Answer({
-                    answer_form: answerForm._id,
-                    question: question._id,
-                    key: question.key,
-                  }).save(function (err, answer) {
-                    if (err) res.status(400).json(err);
+                  var answers = [];
+                  await Promise.all(
+                    questions.map(async (question) => {
+                      await Answer({
+                        answer_form: answerForm._id,
+                        question: question._id,
+                        key: question.key,
+                      }).save(function (err, answer) {
+                        if (err) res.status(400).json(err);
 
-                    answers.push(answer._id);
+                        answers.push(answer._id);
 
-                    console.log(
-                      "questions: " + JSON.stringify(questions_id.length)
-                    );
-                    console.log("answers: " + JSON.stringify(answers.length));
+                        if (answers.length == questions.length) {
+                          answerForm.questions = questions;
+                          answerForm.answers = answers;
+                          answerForm.save(async function (err, answerForm) {
+                            if (err) return res.status(400).json(err);
 
-                    if (answers.length == questions.length) {
-                      answerForm.questions = questions_id;
-                      answerForm.answers = answers;
-                      answerForm.save(async function (err, answerForm) {
-                        console.log("answerform err");
-                        console.log(err);
-                        console.log(answerForm);
-                        if (err) return res.status(400).json(err);
-
-                        return res.json({
-                          message: "Answer Form succesfully created",
-                          data: answerForm,
-                        });
+                            return res.json({
+                              message: "Answer Form succesfully created",
+                              data: answerForm,
+                            });
+                          });
+                        }
                       });
-                    }
-                  });
-                })
+                    })
+                  );
+                }
               );
             }
-          );
-        }
-      ).catch((error) => {
-        console.log(error);
+          ).catch((error) => {
+            console.log(error);
+          });
+        });
+      });
+    }
+  );
+};
+
+// Handle submit actions
+exports.submit = async function (req, res) {
+  console.log(req.body);
+  if (req.body.eventName == "OSM" && req.body.stageName == "preliminary") {
+    score = 0;
+    correct = 0;
+    wrong = 0;
+    empty = 0;
+    AnswerForm.findById(req.body._id, (err, answerForm) => {
+      if (err) return res.status(500).send(err);
+      console.log("answer-form");
+
+      var number = 0;
+
+      answerForm.questions.forEach((question) => {
+        console.log("question");
+
+        Question.findById(question, (err, question) => {
+          if (err) return res.status(500).send(err);
+
+          if (req.body.answers[number] == question.key) {
+            correct++;
+          } else if (
+            req.body.answers[number] == "F" ||
+            req.body.answers[number] == null
+          ) {
+            empty++;
+          } else {
+            wrong++;
+          }
+
+          number++;
+
+          console.log("number: " + number);
+          console.log("questions length: " + answerForm.questions.length);
+
+          if (number == answerForm.questions.length - 1) {
+            score = correct * 4 - wrong;
+
+            answerForm.score = score;
+            answerForm.correct = correct;
+            answerForm.empty = empty;
+            answerForm.wrong = wrong;
+
+            console.log("score: " + answerForm.score);
+            console.log("correct: " + answerForm.correct);
+            console.log("empty: " + answerForm.empty);
+            console.log("wrong: " + answerForm.wrong);
+
+            AnswerForm.findOneAndUpdate(
+              {
+                _id: answerForm._id,
+              },
+              answerForm,
+              function (err, answerForm) {
+                if (err) return res.status(500).send(err);
+
+                return res.json({
+                  message: "Successfully submitted",
+                });
+              }
+            );
+          }
+        });
       });
     });
-  });
+  }
 };
 
 // Handle delete actions
