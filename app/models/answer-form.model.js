@@ -31,6 +31,18 @@ const AnswerForm = mongoose.model(
       type: Number,
       default: 0,
     },
+    correct: {
+      type: Number,
+      default: 0,
+    },
+    empty: {
+      type: Number,
+      default: 0,
+    },
+    wrong: {
+      type: Number,
+      default: 0,
+    },
     created_at: {
       type: Date,
       default: Date.now(),

@@ -38,7 +38,6 @@ exports.view = async function (req, res) {
             }
           );
           participants.push(participant);
-          console.log(participant)
         } catch (error) {
           console.log("error: " + error);
         }
@@ -160,8 +159,6 @@ exports.add = function (req, res) {
         req.body.participantId,
         function (err, participant) {
           if (err) throw err;
-
-          console.log("participant: " + JSON.stringify(participant));
 
           if (participant.participant.events.length == 0) {
             var event = Event.findOne(

@@ -107,6 +107,10 @@ const User = mongoose.model(
             type: Number,
             default: 0,
           },
+          document: {
+            type: Number,
+            default: 0,
+          },
           stages: [
             {
               id: {
