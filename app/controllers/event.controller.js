@@ -12,7 +12,8 @@ var id = "";
 const storage = multer.diskStorage({
   destination: path.join(__dirname + "./../../../"),
   filename: function (req, file, cb) {
-    cb(null, "event_document_" + req.params.id + ".jpg");
+    console.log(req.body)
+    cb(null, "event_document_" + req.params.id + req.params.idParticipant + ".pdf");
   },
 });
 

@@ -15,6 +15,8 @@ const Question = mongoose.model(
     key: String,
     price: Number,
     time: Number,
+    poin: Number,
+    lesson: String,
     session: {
       type: Number,
       default: 1,

@@ -49,9 +49,11 @@ exports.create = function (req, res) {
     solution: req.body.solution ? req.body.solution : "",
     key: req.body.key ? req.body.key : "",
     price: req.body.price ? req.body.price : 0,
+    poin: req.body.poin ? req.body.poin : 0,
     time: req.body.time ? req.body.time : 0,
     session: req.body.session ? req.body.session : 1,
     options: req.body.options ? req.body.options : [],
+    lesson: req.body.lesson ? req.body.lesson : "",
   }).save((err, question) => {
     if (err) return res.json(err);
 

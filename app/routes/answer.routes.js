@@ -13,6 +13,7 @@ module.exports = function(app) {
   app.get("/api/answer/question/:questionId", [authJwt.verifyToken, authJwt.isAdmin], controller.indexByQuestion);
   app.get("/api/answer/:id", [authJwt.verifyToken], controller.view);
   app.post("/api/answer/", [authJwt.verifyToken], controller.create);
-  app.put("/api/answer/:id", [authJwt.verifyToken], controller.update);
+  app.put("/api/answer/:id/upload", [authJwt.verifyToken], controller.update);  
+  app.put("/api/answer/:id", [authJwt.verifyToken], controller.upload);
 };
 
