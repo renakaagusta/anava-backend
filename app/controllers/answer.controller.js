@@ -124,6 +124,7 @@ exports.upload = function (req, res) {
     )
       .then((answer) => {
         if (answer) {
+          console.log("okeee")
           return res.json({
             message: "answer updated",
             data: answer,

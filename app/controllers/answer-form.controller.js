@@ -60,24 +60,49 @@ exports.indexByStage = function (req, res) {
 
 // Handle index actions
 exports.indexByParticipantAndStage = function (req, res) {
-  AnswerForm.find(
+  AnswerForm.findOne(
     {
       stage: req.params.stageId,
       participant: req.params.participantId,
     },
-    function (err, answerForms) {
-      console.log(answerForms)
+    function (err, answerForm) {
       if (err) {
         return res.json({
           status: "error",
           message: err,
         });
       }
-      return res.json({
-        status: "success",
-        message: "AnswerForm Added Successfully",
-        data: answerForms,
-      });
+
+      if (answerForm != null) {
+        if (answerForm.answers != null) {
+          var index = 0;
+
+          answerForm = JSON.parse(JSON.stringify(answerForm));
+
+          answerForm.answers.forEach((answerId) => {
+            Answer.findById(answerId, (err, answer) => {
+              if (err) return res.status(500).send(err);
+
+              answerForm.answers[index] = answer;
+              index++;
+
+              if (index == answerForm.answers.length) {
+                return res.json({
+                  status: "success",
+                  message: "AnswerForm Added Successfully",
+                  data: answerForm,
+                });
+              }
+            });
+          });
+        } else {
+          return res.json({
+            status: "success",
+            message: "AnswerForm Added Successfully",
+            data: answerForm,
+          });
+        }
+      }
     }
   );
 };
@@ -112,7 +137,7 @@ exports.create = async function (req, res) {
     async function (err, answerForm) {
       if (err) return res.status(500).send(err);
 
-      if (answerForm.length > -1) {
+      if (answerForm.length == 0) {
         await Participant.find(
           {
             _id: req.body.participantId,
