@@ -31,6 +31,10 @@ const AnswerForm = mongoose.model(
       type: Number,
       default: 0,
     },
+    money: {
+      type: Number,
+      default: 0,
+    },
     correct: {
       type: Number,
       default: 0,

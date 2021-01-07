@@ -58,23 +58,23 @@ exports.create = function (req, res) {
     if (err) return res.json(err);
 
     //OSM Penyisihan & Ranking 1 Babak Gugur
-    if(req.body.options) {
-      switch(question.key) {
-        case 'A':
+    if (req.body.options) {
+      switch (question.key) {
+        case "A":
           question.key = question.options[0]._id;
-        break;
-        case 'B':
+          break;
+        case "B":
           question.key = question.options[1]._id;
-        break;
-        case 'C':
+          break;
+        case "C":
           question.key = question.options[2]._id;
-        break;
-        case 'D':
+          break;
+        case "D":
           question.key = question.options[3]._id;
-        break;
-        case 'E':
+          break;
+        case "E":
           question.key = question.options[4]._id;
-        break;
+          break;
       }
     }
 
@@ -102,6 +102,7 @@ exports.create = function (req, res) {
 
 // Handle update actions
 exports.update = function (req, res) {
+  console.log(req.body);
   Question.findOneAndUpdate(
     { _id: req.params.id },
     {
@@ -112,17 +113,19 @@ exports.update = function (req, res) {
         title: req.body.description ? req.body.description : "",
         solution: req.body.solution ? req.body.solution : "",
         key: req.body.key ? req.body.key : "",
+        lesson: req.body.lesson ? req.body.lesson : "",
+        poin: req.body.poin ? req.body.poin : "",
         price: req.body.price ? req.body.price : 0,
         time: req.body.time ? req.body.time : 0,
         session: req.body.session ? req.body.session : 1,
         options: req.body.options ? req.body.options : [],
         updatedAt: Date.now(),
       },
-    }
-  )
-    .then((question) => {
-      console.log(JSON.stringify(question))
-      console.log(req.body.content)
+    },
+    { new: true },
+    (err, question) => {
+      if (err) return res.send(err);
+
       if (question) {
         return res.json({
           message: "question updated",
@@ -134,13 +137,8 @@ exports.update = function (req, res) {
           data: {},
         });
       }
-    })
-    .catch((err) => {
-      return res.json({
-        message: "error",
-        data: err,
-      });
-    });
+    }
+  );
 };
 
 // Handle delete actions

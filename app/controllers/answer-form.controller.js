@@ -119,9 +119,36 @@ exports.view = function (req, res) {
 
       answerForm.participant = participant;
 
-      return res.json({
-        message: "answerForms Detail Loading...",
-        data: answerForm,
+      var index = 0;
+
+      answerForm.answers.forEach((answerId) => {
+        Answer.findById(answerId, (err, answer) => {
+          if (err) return res.status(500).send(err);
+
+          answerForm.answers[index] = answer;
+          index++;
+
+          if (index == answerForm.answers.length) {
+            index = 0;
+
+            answerForm.questions.forEach((questionId) => {
+              Question.findById(questionId, (err, answer) => {
+                if (err) return res.status(500).send(err);
+
+                answerForm.questions[index] = answer;
+                index++;
+
+                if (index == answerForm.questions.length) {
+                  return res.json({
+                    status: "success",
+                    message: "AnswerForm Added Successfully",
+                    data: answerForm,
+                  });
+                }
+              });
+            });
+          }
+        });
       });
     });
   });
@@ -234,6 +261,10 @@ exports.create = async function (req, res) {
                                     ) {
                                       if (err) return res.status(400).json(err);
 
+                                      answerForm = JSON.parse(JSON.stringify(answerForm));
+
+                                      answerForm.money = 20000;
+
                                       return res.json({
                                         message:
                                           "Answer Form succesfully created",
@@ -332,58 +363,79 @@ exports.submit = async function (req, res) {
     correct = 0;
     wrong = 0;
     empty = 0;
-    AnswerForm.findById(req.body._id, (err, answerForm) => {
+    await AnswerForm.findById(req.body._id, async (err, answerForm) => {
       if (err) return res.status(500).send(err);
 
       var number = 0;
+      var _number = 0;
 
-      answerForm.questions.forEach((question) => {
-        Question.findById(question, (err, question) => {
-          if (err) return res.status(500).send(err);
+      await Promise.all(
+        answerForm.questions.map(async (question) => {
+          await Question.findById(question, async (err, question) => {
+            if (err) return res.status(500).send(err);
 
-          if (req.body.answers[number] == question.key) {
-            correct++;
-          } else if (
-            req.body.answers[number] == "F" ||
-            req.body.answers[number] == null
-          ) {
-            empty++;
-          } else {
-            wrong++;
-          }
-
-          number++;
-
-          if (number == answerForm.questions.length - 1) {
-            score = correct * 4 - wrong;
-
-            answerForm.score = score;
-            answerForm.correct = correct;
-            answerForm.empty = empty;
-            answerForm.wrong = wrong;
-            answerForm.updated_at = new Date();
-
-            console.log("score: " + answerForm.score);
-            console.log("correct: " + answerForm.correct);
-            console.log("empty: " + answerForm.empty);
-            console.log("wrong: " + answerForm.wrong);
-
-            AnswerForm.findOneAndUpdate(
+            await Answer.findOneAndUpdate(
               {
-                _id: answerForm._id,
+                answer_form: answerForm._id,
+                question: question._id,
               },
-              answerForm,
-              function (err, answerForm) {
+              {
+                $set: { choosed_option: req.body.answers[question.number - 1] },
+              },
+              { new: true },
+              async (err, answer) => {
                 if (err) return res.status(500).send(err);
 
-                return res.json({
-                  message: "Successfully submitted",
-                });
+                if (req.body.answers[question.number - 1] == question.key) {
+                  correct++;
+                } else if (
+                  req.body.answers[question.number - 1] == "F" ||
+                  req.body.answers[question.number - 1] == null
+                ) {
+                  empty++;
+                } else {
+                  wrong++;
+                }
+
+                number++;
+
+                if (number == answerForm.questions.length) {
+                  score = correct * 4 - wrong;
+
+                  answerForm.score = score;
+                  answerForm.correct = correct;
+                  answerForm.empty = empty;
+                  answerForm.wrong = wrong;
+                  answerForm.updated_at = new Date();
+
+                  console.log("score: " + answerForm.score);
+                  console.log("correct: " + answerForm.correct);
+                  console.log("empty: " + answerForm.empty);
+                  console.log("wrong: " + answerForm.wrong);
+
+                  AnswerForm.findOneAndUpdate(
+                    {
+                      _id: answerForm._id,
+                    },
+                    answerForm,
+                    { new: true },
+                    function (err, answerForm) {
+                      if (err) return res.status(500).send(err);
+
+                      return res.json({
+                        data: answerForm,
+                        message: "Successfully submitted",
+                      });
+                    }
+                  );
+                }
               }
             );
-          }
-        });
-      });
+          });
+        })
+      );
+
+      await answerForm.questions.forEach(async (question) => {});
     });
   }
   if (req.body.eventName == "The One" && req.body.stageName == "preliminary") {
@@ -391,56 +443,160 @@ exports.submit = async function (req, res) {
     correct = 0;
     wrong = 0;
     empty = 0;
-    AnswerForm.findById(req.body._id, (err, answerForm) => {
+    await AnswerForm.findById(req.body._id, async (err, answerForm) => {
       if (err) return res.status(500).send(err);
 
       var number = 0;
+     
+      await Promise.all(
+        answerForm.questions.map(async (question) => {
+        await Question.findById(question, async (err, question) => {
+          if (err) return res.status(500).send(err);console.log("search id" + answerForm.answers[question.number - 1])
 
-      answerForm.questions.forEach((question) => {
-        Question.findById(question, (err, question) => {
-          if (err) return res.status(500).send(err);
+          await Answer.findOneAndUpdate(
+            {
+              answer_form: answerForm._id,
+              question: question._id,
+            },
+            { $set: { choosed_option: req.body.answers[question.number - 1] } },
+            { new: true },
+            (err, answer) => {
+              if (err) return res.status(500).send(err);
 
-          if (req.body.answers[number] == question.key) {
-            correct++;
-            score += question.poin;
-          } else if (
-            req.body.answers[number] == "F" ||
-            req.body.answers[number] == null
-          ) {
-            empty++;
-          } else {
-            wrong++;
-          }
+              console.log("number:" + (question.number - 1));
+              console.log(
+                "answerId:" + answerForm.answers[question.number - 1]
+              );
+              console.log("answerId:" + answer._id);
+              console.log("answer:" + req.body.answers[question.number - 1]);
+              console.log("answer:" + answer.choosed_option);
+              console.log();
 
-          number++;
+              if (req.body.answers[question.number - 1] == question.key) {
+                correct++;
+                score += question.poin;
+              } else if (
+                req.body.answers[question.number - 1] == "F" ||
+                req.body.answers[question.number - 1] == null
+              ) {
+                empty++;
+              } else {
+                wrong++;
+              }
 
-          if (number == answerForm.questions.length - 1) {
-            answerForm.score = score;
-            answerForm.correct = correct;
-            answerForm.empty = empty;
-            answerForm.wrong = wrong;
+              number++;
 
-            console.log("score: " + answerForm.score);
-            console.log("correct: " + answerForm.correct);
-            console.log("empty: " + answerForm.empty);
-            console.log("wrong: " + answerForm.wrong);
+              if (number == answerForm.questions.length) {
+                answerForm.score = score;
+                answerForm.correct = correct;
+                answerForm.empty = empty;
+                answerForm.wrong = wrong;
 
-            AnswerForm.findOneAndUpdate(
+                console.log("score: " + answerForm.score);
+                console.log("correct: " + answerForm.correct);
+                console.log("empty: " + answerForm.empty);
+                console.log("wrong: " + answerForm.wrong);
+
+                AnswerForm.findOneAndUpdate(
+                  {
+                    _id: answerForm._id,
+                  },
+                  answerForm,
+                  { new: true },
+                  function (err, answerForm) {
+                    if (err) return res.status(500).send(err);
+
+                    return res.json({
+                      data: answerForm,
+                      message: "Successfully submitted",
+                    });
+                  }
+                );
+              }
+            }
+          );
+        });
+      }));
+    });
+  }
+  if (req.body.eventName == "The One" && req.body.stageName == "semifinal") {
+    score = 0;
+    correct = 0;
+    wrong = 0;
+    empty = 0;
+    await AnswerForm.findById(req.body._id, async (err, answerForm) => {
+      if (err) return res.status(500).send(err);
+
+      var number = 0;
+      var _number = 0;
+
+      await Promise.all(
+        answerForm.questions.map(async (question) => {
+          await Question.findById(question, async (err, question) => {
+            if (err) return res.status(500).send(err);
+
+            await Answer.findOneAndUpdate(
               {
-                _id: answerForm._id,
+                answer_form: answerForm._id,
+                question: question._id,
               },
-              answerForm,
-              function (err, answerForm) {
+              {
+                $set: { choosed_option: req.body.answers[question.number - 1] },
+              },
+              { new: true },
+              async (err, answer) => {
                 if (err) return res.status(500).send(err);
 
-                return res.json({
-                  message: "Successfully submitted",
-                });
+                if (req.body.answers[question.number - 1] == question.key) {
+                  correct++;
+                  score += question.poin;
+                } else if (
+                  req.body.answers[question.number - 1] == "F" ||
+                  req.body.answers[question.number - 1] == null
+                ) {
+                  empty++;
+                } else {
+                  wrong++;
+                }
+
+                number++;
+
+                if (number == answerForm.questions.length) {
+
+                  answerForm.score = score;
+                  answerForm.correct = correct;
+                  answerForm.empty = empty;
+                  answerForm.wrong = wrong;
+                  answerForm.updated_at = new Date();
+
+                  console.log("score: " + answerForm.score);
+                  console.log("correct: " + answerForm.correct);
+                  console.log("empty: " + answerForm.empty);
+                  console.log("wrong: " + answerForm.wrong);
+
+                  AnswerForm.findOneAndUpdate(
+                    {
+                      _id: answerForm._id,
+                    },
+                    answerForm,
+                    { new: true },
+                    function (err, answerForm) {
+                      if (err) return res.status(500).send(err);
+
+                      return res.json({
+                        data: answerForm,
+                        message: "Successfully submitted",
+                      });
+                    }
+                  );
+                }
               }
             );
-          }
-        });
-      });
+          });
+        })
+      );
+
+      await answerForm.questions.forEach(async (question) => {});
     });
   }
 };

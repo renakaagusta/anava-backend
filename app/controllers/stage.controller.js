@@ -161,7 +161,8 @@ exports.add = function (req, res) {
           if (err) throw err;
 
           if (participant.participant.events.length == 0) {
-            var event = Event.findOne(
+            console.log("oopsss")
+            /*var event = Event.findOne(
               {
                 stages: db.mongoose.Types.ObjectId(req.params.id),
               },
@@ -198,8 +199,9 @@ exports.add = function (req, res) {
                   }
                 );
               }
-            );
+            );*/
           } else {
+            
             var event = Event.findOne(
               {
                 stages: db.mongoose.Types.ObjectId(req.params.id),
@@ -216,16 +218,19 @@ exports.add = function (req, res) {
                     var index = 0;
                     var find = 0;
                     _participant.participant.events.forEach((_event) => {
-                      if (_event.id == event._id) {
-                        find = 1;
+                      if (_event.name == event.name) {
+                        find = 1;console.log(event.name)
                         events[index].stages.push({
                           id: req.params.id,
                           name: stage.name,
                           session: req.body.session ? req.body.session : 1,
                         });
+                        console.log(events[index])
+                      
                       }
                       index++;
-                    });
+                    });console.log(find);
+                    
 
                     if(find==0) {
                       var newEvent = {
@@ -240,10 +245,10 @@ exports.add = function (req, res) {
                       events.push(newEvent)
                     }
 
-                    _participant.participant.events = events;
+                    _participant.participant.events = events;console.log(_participant.participant.events)
 
                     _participant.save((err, participant) => {
-                      if (err) throw err;
+                      if (err) throw err;console.log(participant)
                       return res.json({
                         message: "participant succesfully added",
                         data: participant,
