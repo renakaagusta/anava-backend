@@ -362,7 +362,7 @@ exports.submit = async function (req, res) {
     score = 0;
     correct = 0;
     wrong = 0;
-    empty = 0;
+    empty = 0;console.log(req.body);
     await AnswerForm.findById(req.body._id, async (err, answerForm) => {
       if (err) return res.status(500).send(err);
 
