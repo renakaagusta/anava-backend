@@ -362,7 +362,7 @@ exports.submit = async function (req, res) {
     score = 0;
     correct = 0;
     wrong = 0;
-    empty = 0;console.log(req.body);
+    empty = 0;
     await AnswerForm.findById(req.body._id, async (err, answerForm) => {
       if (err) return res.status(500).send(err);
 
@@ -385,6 +385,12 @@ exports.submit = async function (req, res) {
               { new: true },
               async (err, answer) => {
                 if (err) return res.status(500).send(err);
+
+                console.log("nomor: " + (question.number - 1));
+                console.log("nomor soal: " + question.number);
+                console.log("jawaban: " + req.body.answers[question.number - 1]);
+                console.log("kunci: " + question.key);
+                console.log()
 
                 if (req.body.answers[question.number - 1] == question.key) {
                   correct++;
