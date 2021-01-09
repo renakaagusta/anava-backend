@@ -23,6 +23,10 @@ const AnswerForm = mongoose.model(
         ref: "Answer",
       },
     ],
+    _answers: {
+        type: String,
+        default: "",
+    },
     poin: {
       type: Number,
       default: 0,
