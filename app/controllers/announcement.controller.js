@@ -87,7 +87,7 @@ exports.indexGeneral = function (req, res) {
 
 // Handle view actions
 exports.indexByStage = function (req, res) {
-  console.log("helllooooo")
+  
   Announcement.find(
     {
       stage: req.params.id,

@@ -239,6 +239,7 @@ exports.create = async function (req, res) {
                               questions[currentIndex] = questions[randomIndex];
                               questions[randomIndex] = temporaryValue;
                             }
+                            console.log("ini lhooooo");
 
                             var answers = [];
                             await Promise.all(
@@ -370,15 +371,17 @@ exports.submit = async function (req, res) {
 
       var questions = [];
       var index = 0;
+      var answers = [];
 
-      answerForm._answers = JSON.stringify(req.body.answers);
+      req.body.answers.forEach(() => {
+        answers.push(null);
+      });
 
       await Promise.all(
         answerForm.questions.map(async (question) => {
           await Question.findById(question, async (err, question) => {
             if (err) return res.status(500).send(err);
             index++;
-            console.log(index + "a");
 
             console.log("nomor soal: " + question.number);
             question = JSON.parse(JSON.stringify(question));
@@ -389,6 +392,7 @@ exports.submit = async function (req, res) {
 
               questions.forEach((question) => {
                 console.log(index + "b");
+                answers[question.number - 1] = req.body.answers[index];
 
                 console.log("ke: " + (index + 1));
                 console.log("nomor soal: " + question.number);
@@ -414,6 +418,7 @@ exports.submit = async function (req, res) {
                   answerForm.correct = correct;
                   answerForm.empty = empty;
                   answerForm.wrong = wrong;
+                  answerForm._answers = JSON.stringify(answers);
                   answerForm.updated_at = new Date();
 
                   console.log("score: " + answerForm.score);
@@ -442,8 +447,6 @@ exports.submit = async function (req, res) {
           });
         })
       );
-
-      await answerForm.questions.forEach(async (question) => {});
     });
   }
   if (req.body.eventName == "The One" && req.body.stageName == "preliminary") {
@@ -451,164 +454,184 @@ exports.submit = async function (req, res) {
     correct = 0;
     wrong = 0;
     empty = 0;
-    await AnswerForm.findById(req.body._id, async (err, answerForm) => {
-      if (err) return res.status(500).send(err);
+    await AnswerForm.findOne(
+      {
+        participant: req.body.participant,
+        stage: req.body.stage,
+      },
+      async (err, answerForm) => {
+        if (err) return res.status(500).send(err);
 
-      var number = 0;
+        var questions = [];
+        var index = 0;
+        var answers = [];
 
-      await Promise.all(
-        answerForm.questions.map(async (question) => {
-          await Question.findById(question, async (err, question) => {
-            if (err) return res.status(500).send(err);
-            console.log("search id" + answerForm.answers[question.number - 1]);
+        req.body.answers.forEach(() => {
+          answers.push(null);
+        });
 
-            await Answer.findOneAndUpdate(
-              {
-                answer_form: answerForm._id,
-                question: question._id,
-              },
-              {
-                $set: { choosed_option: req.body.answers[question.number - 1] },
-              },
-              { new: true },
-              (err, answer) => {
-                if (err) return res.status(500).send(err);
+        await Promise.all(
+          answerForm.questions.map(async (question) => {
+            await Question.findById(question, async (err, question) => {
+              if (err) return res.status(500).send(err);
+              answers[question.number - 1] = req.body.answers[index];
 
-                console.log("number:" + (question.number - 1));
-                console.log(
-                  "answerId:" + answerForm.answers[question.number - 1]
-                );
-                console.log("answerId:" + answer._id);
-                console.log("answer:" + req.body.answers[question.number - 1]);
-                console.log("answer:" + answer.choosed_option);
-                console.log();
+              index++;
+              question = JSON.parse(JSON.stringify(question));
+              questions.push(question);
 
-                if (req.body.answers[question.number - 1] == question.key) {
-                  correct++;
-                  score += question.poin;
-                } else if (
-                  req.body.answers[question.number - 1] == "F" ||
-                  req.body.answers[question.number - 1] == null
-                ) {
-                  empty++;
-                } else {
-                  wrong++;
-                }
+              if (questions.length == req.body.answers.length) {
+                index = 0;
 
-                number++;
+                questions.forEach((question) => {
+                  console.log(index + "b");
 
-                if (number == answerForm.questions.length) {
-                  answerForm.score = score;
-                  answerForm.correct = correct;
-                  answerForm.empty = empty;
-                  answerForm.wrong = wrong;
+                  console.log("ke: " + (index + 1));
+                  console.log("nomor soal: " + question.number);
+                  console.log("jawaban: " + req.body.answers[index]);
+                  console.log("kunci: " + question.key);
+                  if (req.body.answers[index] == question.key) {
+                    correct++;
+                    score += question.poin;
+                  } else if (
+                    req.body.answers[index] == "F" ||
+                    req.body.answers[index] == null
+                  ) {
+                    empty++;
+                  } else {
+                    wrong++;
+                  }
 
-                  console.log("score: " + answerForm.score);
-                  console.log("correct: " + answerForm.correct);
-                  console.log("empty: " + answerForm.empty);
-                  console.log("wrong: " + answerForm.wrong);
+                  index++;
 
-                  AnswerForm.findOneAndUpdate(
-                    {
-                      _id: answerForm._id,
-                    },
-                    answerForm,
-                    { new: true },
-                    function (err, answerForm) {
-                      if (err) return res.status(500).send(err);
+                  if (index == req.body.answers.length) {
+                    answerForm.score = score;
+                    answerForm.correct = correct;
+                    answerForm.empty = empty;
+                    answerForm.wrong = wrong;
+                    answerForm._answers = JSON.stringify(answers);
+                    answerForm.updated_at = new Date();
 
-                      return res.json({
-                        data: answerForm,
-                        message: "Successfully submitted",
-                      });
-                    }
-                  );
-                }
+                    console.log("score: " + answerForm.score);
+                    console.log("correct: " + answerForm.correct);
+                    console.log("empty: " + answerForm.empty);
+                    console.log("wrong: " + answerForm.wrong);
+
+                    AnswerForm.findOneAndUpdate(
+                      {
+                        _id: answerForm._id,
+                      },
+                      answerForm,
+                      { new: true },
+                      function (err, answerForm) {
+                        if (err) return res.status(500).send(err);
+
+                        return res.json({
+                          data: answerForm,
+                          message: "Successfully submitted",
+                        });
+                      }
+                    );
+                  }
+                });
               }
-            );
-          });
-        })
-      );
-    });
+            });
+          })
+        );
+      }
+    );
   }
   if (req.body.eventName == "The One" && req.body.stageName == "semifinal") {
     score = 0;
     correct = 0;
     wrong = 0;
     empty = 0;
-    await AnswerForm.findById(req.body._id, async (err, answerForm) => {
-      if (err) return res.status(500).send(err);
+    await AnswerForm.findOne(
+      {
+        _id: req.body._id
+      },
+      async (err, answerForm) => {
+        if (err) return res.status(500).send(err);
 
-      var number = 0;
-      var _number = 0;
+        var questions = [];
+        var index = 0;
+        var answers = [];
 
-      await Promise.all(
-        answerForm.questions.map(async (question) => {
-          await Question.findById(question, async (err, question) => {
-            if (err) return res.status(500).send(err);
+        req.body.answers.forEach(() => {
+          answers.push(null);
+        });
 
-            await Answer.findOneAndUpdate(
-              {
-                answer_form: answerForm._id,
-                question: question._id,
-              },
-              {
-                $set: { choosed_option: req.body.answers[question.number - 1] },
-              },
-              { new: true },
-              async (err, answer) => {
-                if (err) return res.status(500).send(err);
+        await Promise.all(
+          answerForm.questions.map(async (question) => {
+            await Question.findById(question, async (err, question) => {
+              if (err) return res.status(500).send(err);
+              answers[question.number - 1] = req.body.answers[index];
 
-                if (req.body.answers[question.number - 1] == question.key) {
-                  correct++;
-                  score += question.poin;
-                } else if (
-                  req.body.answers[question.number - 1] == "F" ||
-                  req.body.answers[question.number - 1] == null
-                ) {
-                  empty++;
-                } else {
-                  wrong++;
-                }
+              index++;
+              question = JSON.parse(JSON.stringify(question));
+              questions.push(question);
 
-                number++;
+              if (questions.length == req.body.answers.length) {
+                index = 0;
 
-                if (number == answerForm.questions.length) {
-                  answerForm.score = score;
-                  answerForm.correct = correct;
-                  answerForm.empty = empty;
-                  answerForm.wrong = wrong;
-                  answerForm.updated_at = new Date();
+                questions.forEach((question) => {
+                  console.log(index + "b");
 
-                  console.log("score: " + answerForm.score);
-                  console.log("correct: " + answerForm.correct);
-                  console.log("empty: " + answerForm.empty);
-                  console.log("wrong: " + answerForm.wrong);
+                  console.log("ke: " + (index + 1));
+                  console.log("nomor soal: " + question.number);
+                  console.log("jawaban: " + req.body.answers[index]);
+                  console.log("kunci: " + question.key);
+                  if (req.body.answers[index] == question.key) {
+                    correct++;
+                    score += question.poin;
+                  } else if (
+                    req.body.answers[index] == "F" ||
+                    req.body.answers[index] == null
+                  ) {
+                    empty++;
+                  } else {
+                    wrong++;
+                  }
 
-                  AnswerForm.findOneAndUpdate(
-                    {
-                      _id: answerForm._id,
-                    },
-                    answerForm,
-                    { new: true },
-                    function (err, answerForm) {
-                      if (err) return res.status(500).send(err);
+                  index++;
 
-                      return res.json({
-                        data: answerForm,
-                        message: "Successfully submitted",
-                      });
-                    }
-                  );
-                }
+                  if (index == req.body.answers.length) {
+                    answerForm.score = score;
+                    answerForm.correct = correct;
+                    answerForm.empty = empty;
+                    answerForm.wrong = wrong;
+                    answerForm._answers = JSON.stringify(answers);
+                    answerForm.money = req.body.money;
+                    answerForm.updated_at = new Date();
+
+                    console.log("score: " + answerForm.score);
+                    console.log("correct: " + answerForm.correct);
+                    console.log("empty: " + answerForm.empty);
+                    console.log("wrong: " + answerForm.wrong);
+
+                    AnswerForm.findOneAndUpdate(
+                      {
+                        _id: answerForm._id,
+                      },
+                      answerForm,
+                      { new: true },
+                      function (err, answerForm) {
+                        if (err) return res.status(500).send(err);
+
+                        return res.json({
+                          data: answerForm,
+                          message: "Successfully submitted",
+                        });
+                      }
+                    );
+                  }
+                });
               }
-            );
-          });
-        })
-      );
-
-      await answerForm.questions.forEach(async (question) => {});
-    });
+            });
+          })
+        );
+      }
+    );
   }
 };
 
