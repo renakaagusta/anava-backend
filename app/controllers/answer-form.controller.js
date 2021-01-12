@@ -659,7 +659,8 @@ exports.setScore = function (req, res) {
 exports.delete = function (req, res) {
   AnswerForm.remove(
     {
-      _id: req.params.id,
+      participant: req.body.idParticipant,
+      stage: req.body.idStage,
     },
     function (err, answerForm) {
       if (err) return res.send(err);
