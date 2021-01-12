@@ -256,7 +256,7 @@ exports.signup = (req, res) => {
               }
 
               var transporter = nodemailer.createTransport({
-                service: "gmail",
+                service: "Gmail",
                 auth: {
                   user: email,
                   pass: password,
