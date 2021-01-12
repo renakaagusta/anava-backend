@@ -25,8 +25,11 @@ exports.signup = (req, res) => {
       return;
     }
 
-    var email = mail.email;
-    var password = email.password;
+    //var email = mail.email;
+    //var password = email.password;
+
+    var email = "renakaagusta28@gmail.com"
+    var password = "@Renaka28"
 
     user.save((err, user) => {
       if (err) {
