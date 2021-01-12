@@ -657,12 +657,14 @@ exports.setScore = function (req, res) {
 
 // Handle delete actions
 exports.delete = function (req, res) {
+  console.log(req.body)
   AnswerForm.remove(
     {
       participant: req.body.idParticipant,
       stage: req.body.idStage,
     },
     function (err, answerForm) {
+      console.log(answerForm)
       if (err) return res.send(err);
       return res.json({
         status: "success",
