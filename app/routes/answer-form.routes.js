@@ -15,5 +15,5 @@ module.exports = function(app) {
   app.post("/api/answer-form", [authJwt.verifyToken], controller.create);
   app.put("/api/answer-form/:id", [authJwt.verifyToken], controller.submit);
   app.put("/api/answer-form/:id/score", [authJwt.verifyToken, authJwt.isAdmin], controller.setScore);
-  app.delete("/api/answer-form", controller.delete);
+  app.delete("/api/answer-form/:idStage/:idParticipant", controller.delete);
 };

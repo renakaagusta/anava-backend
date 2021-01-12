@@ -657,11 +657,11 @@ exports.setScore = function (req, res) {
 
 // Handle delete actions
 exports.delete = function (req, res) {
-  console.log(req.body)
+  console.log(req.params)
   AnswerForm.remove(
     {
-      participant: req.body.idParticipant,
-      stage: req.body.idStage,
+      participant: req.params.idParticipant,
+      stage: req.params.idStage,
     },
     function (err, answerForm) {
       console.log(answerForm)
