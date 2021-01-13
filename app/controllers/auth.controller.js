@@ -6,7 +6,7 @@ const Event = db.event;
 const Role = db.role;
 const Mail = db.mail;
 
-var url = "http://13.72.81.174/";
+var url = "http://anavaugm.com/";
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
@@ -25,11 +25,11 @@ exports.signup = (req, res) => {
       return;
     }
 
-    //var email = mail.email;
-    //var password = email.password;
+    var email = mail.email;
+    var password = email.password;
 
-    var email = "renakaagusta28@gmail.com"
-    var password = "@Renaka28"
+    //var email = "renakaagusta28@gmail.com"
+    //var password = "@Renaka28"
 
     user.save((err, user) => {
       if (err) {
@@ -181,7 +181,7 @@ exports.signup = (req, res) => {
       mailBodyForVerification +=
         '                        <td bgcolor="#ffffff" align="center" valign="top" style="padding: 40px 20px 20px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: \'Lato\', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 4px; line-height: 48px;">';
       mailBodyForVerification +=
-        '                            <h1 style="font-size: 48px; font-weight: 400; margin: 2;">Halo!</h1> <img src="http://13.72.81.174/logo-anava.png" width="125" height="120" style="display: block; border: 0px;" />';
+        '                            <h1 style="font-size: 48px; font-weight: 400; margin: 2;">Halo!</h1> <img src="http://anavaugm.com/logo-anava.png" width="125" height="120" style="display: block; border: 0px;" />';
       mailBodyForVerification += "                        </td>";
       mailBodyForVerification += "                    </tr>";
       mailBodyForVerification += "                </table>";
@@ -595,7 +595,7 @@ exports.requestChangePassword = (req, res) => {
             '                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">' +
             "                    <tr>" +
             '                        <td bgcolor="#ffffff" align="center" valign="top" style="padding: 40px 20px 20px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: \'Lato\', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 4px; line-height: 48px;">' +
-            '                            <h1 style="font-size: 48px; font-weight: 400; margin: 2;">Ganti sandi</h1> <img src="http://13.72.81.174/logo-anava.png" width="125" height="120" style="display: block; border: 0px;" />' +
+            '                            <h1 style="font-size: 48px; font-weight: 400; margin: 2;">Ganti sandi</h1> <img src="http://anavaugm.com/logo-anava.png" width="125" height="120" style="display: block; border: 0px;" />' +
             "                        </td>" +
             "                    </tr>" +
             "                </table>" +
@@ -616,7 +616,7 @@ exports.requestChangePassword = (req, res) => {
             '                                    <td bgcolor="#ffffff" align="center" style="padding: 20px 30px 60px 30px;">' +
             '                                        <table border="0" cellspacing="0" cellpadding="0">' +
             "                                            <tr>" +
-            '                                                <td align="center" style="border-radius: 3px;" bgcolor="#746cc0"><a href="http://13.72.81.174/change-password/' +
+            '                                                <td align="center" style="border-radius: 3px;" bgcolor="#746cc0"><a href="http://anavaugm.com/change-password/' +
             user._id +
             '" target="_blank" style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; padding: 15px 25px; border-radius: 2px; display: inline-block;">Ganti</a></td>' +
             "                                            </tr>" +
