@@ -111,11 +111,10 @@ exports.indexByParticipantAndStage = function (req, res) {
 exports.view = function (req, res) {
   AnswerForm.findById(req.params.id, function (err, answerForm) {
     if (err) return res.status(500).send(err);
-    console.log(answerForm);
-
     Participant.findById(answerForm.participant, (err, participant) => {
+      console.log(err)
       if (err) return res.status(500).send(err);
-
+      console.log(participant)
       answerForm = JSON.parse(JSON.stringify(answerForm));
 
       answerForm.participant = participant;
