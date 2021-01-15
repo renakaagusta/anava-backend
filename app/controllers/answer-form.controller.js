@@ -112,9 +112,9 @@ exports.view = function (req, res) {
   AnswerForm.findById(req.params.id, function (err, answerForm) {
     if (err) return res.status(500).send(err);
     Participant.findById(answerForm.participant, (err, participant) => {
-      console.log(err)
+      console.log(err);
       if (err) return res.status(500).send(err);
-      console.log(participant)
+      console.log(participant);
       answerForm = JSON.parse(JSON.stringify(answerForm));
 
       answerForm.participant = participant;
@@ -123,9 +123,9 @@ exports.view = function (req, res) {
 
       answerForm.answers.forEach((answerId) => {
         Answer.findById(answerId, (err, answer) => {
-          console.log(err)
+          console.log(err);
           if (err) return res.status(500).send(err);
-          console.log("answerIndex: "+index);
+          console.log("answerIndex: " + index);
 
           answerForm.answers[index] = answer;
           index++;
@@ -143,14 +143,16 @@ exports.view = function (req, res) {
                 Question.findById(questionId, (err, question) => {
                   if (err) return res.status(500).send(err);
 
-
-                  console.log("questionIndex: "+index);
+                  console.log("questionIndex: " + index);
 
                   question = JSON.parse(JSON.stringify(question));
                   question.content = null;
                   question.answers = null;
 
-                  answerForm.questions[index] = question;
+                  answerForm.questions[index] = {
+                    number: question.number,
+                    key: question.key,
+                  };
                   index++;
 
                   console.log(index);
