@@ -375,7 +375,6 @@ exports.submit = async function (req, res) {
     await AnswerForm.findById(req.body._id, async (err, answerForm) => {
       if (err) return res.status(500).send(err);
 
-      var questions = [];
       var index = 0;
       var answers = [];
 
@@ -436,8 +435,6 @@ exports.submit = async function (req, res) {
             }
           );
         }
-
-        index++;
       });
     });
   }
