@@ -391,6 +391,7 @@ exports.submit = async function (req, res) {
       if (err) return res.status(500).send(err);
 
       var index = 0;
+      var questions = [];
       var answers = [];
 
       req.body.answers.forEach(() => {
@@ -402,6 +403,10 @@ exports.submit = async function (req, res) {
       console.log(req.body.answers)
 
       req.body.questions.forEach((question) => {
+        questions.push({
+          number: question.number,
+          key: question.key,
+        })
         answers[question.number - 1] = req.body.answers[index];
 
         console.log("ke: " + (index + 1));
@@ -429,6 +434,7 @@ exports.submit = async function (req, res) {
           answerForm.empty = empty;
           answerForm.wrong = wrong;
           answerForm._answers = JSON.stringify(req.body.answers);
+          answerForm._questions = JSON.stringify(questions);
           answerForm.updated_at = new Date();
 
           console.log("score: " + answerForm.score);
