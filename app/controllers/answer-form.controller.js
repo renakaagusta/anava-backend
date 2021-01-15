@@ -131,28 +131,35 @@ exports.view = function (req, res) {
           index++;
 
           if (index == answerForm.answers.length) {
-            return res.json({
-              status: "success",
-              message: "AnswerForm Added Successfully",
-              data: answerForm,
-            });
-
-            answerForm.questions.forEach((questionId) => {
-              Question.findById(questionId, (err, answer) => {
-                if (err) return res.status(500).send(err);
-
-                answerForm.questions[index] = answer;
-                index++;
-
-                if (index == answerForm.questions.length) {
-                  return res.json({
-                    status: "success",
-                    message: "AnswerForm Added Successfully",
-                    data: answerForm,
-                  });
-                }
+            if (answerForm.stage == "5fcde27a333a4119d266771d") {
+              return res.json({
+                status: "success",
+                message: "AnswerForm Added Successfully",
+                data: answerForm,
               });
-            });
+            } else {
+              index = 0;
+              answerForm.questions.forEach((questionId) => {
+                Question.findById(questionId, (err, question) => {
+                  if (err) return res.status(500).send(err);
+
+                  question = JSON.parse(JSON.stringify(question));
+                  question.content = null;
+                  questions.answers = null;
+
+                  answerForm.questions[index] = question;
+                  index++;
+
+                  if (index == answerForm.questions.length) {
+                    return res.json({
+                      status: "success",
+                      message: "AnswerForm Added Successfully",
+                      data: answerForm,
+                    });
+                  }
+                });
+              });
+            }
           }
         });
       });
