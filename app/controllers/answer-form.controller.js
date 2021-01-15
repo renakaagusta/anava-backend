@@ -111,6 +111,7 @@ exports.indexByParticipantAndStage = function (req, res) {
 exports.view = function (req, res) {
   AnswerForm.findById(req.params.id, function (err, answerForm) {
     if (err) return res.status(500).send(err);
+    console.log(answerForm);
 
     Participant.findById(answerForm.participant, (err, participant) => {
       if (err) return res.status(500).send(err);
@@ -126,10 +127,15 @@ exports.view = function (req, res) {
           if (err) return res.status(500).send(err);
 
           answerForm.answers[index] = answer;
+          index = 0;
           index++;
 
           if (index == answerForm.answers.length) {
-            index = 0;
+            return res.json({
+              status: "success",
+              message: "AnswerForm Added Successfully",
+              data: answerForm,
+            });
 
             answerForm.questions.forEach((questionId) => {
               Question.findById(questionId, (err, answer) => {
@@ -548,7 +554,7 @@ exports.submit = async function (req, res) {
     empty = 0;
     await AnswerForm.findOne(
       {
-        _id: req.body._id
+        _id: req.body._id,
       },
       async (err, answerForm) => {
         if (err) return res.status(500).send(err);
@@ -657,14 +663,14 @@ exports.setScore = function (req, res) {
 
 // Handle delete actions
 exports.delete = function (req, res) {
-  console.log(req.params)
+  console.log(req.params);
   AnswerForm.remove(
     {
       participant: req.params.idParticipant,
       stage: req.params.idStage,
     },
     function (err, answerForm) {
-      console.log(answerForm)
+      console.log(answerForm);
       if (err) return res.send(err);
       return res.json({
         status: "success",
