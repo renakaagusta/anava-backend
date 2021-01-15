@@ -399,6 +399,8 @@ exports.submit = async function (req, res) {
 
       index = 0;
 
+      console.log(req.body.answers)
+
       req.body.questions.forEach((question) => {
         answers[question.number - 1] = req.body.answers[index];
 
@@ -426,7 +428,7 @@ exports.submit = async function (req, res) {
           answerForm.correct = correct;
           answerForm.empty = empty;
           answerForm.wrong = wrong;
-          answerForm._answers = JSON.stringify(answers);
+          answerForm._answers = JSON.stringify(req.body.answers);
           answerForm.updated_at = new Date();
 
           console.log("score: " + answerForm.score);
