@@ -123,7 +123,9 @@ exports.view = function (req, res) {
 
       answerForm.answers.forEach((answerId) => {
         Answer.findById(answerId, (err, answer) => {
+          console.log(errr)
           if (err) return res.status(500).send(err);
+          console.log("answerIndex: "+index);
 
           answerForm.answers[index] = answer;
           index = 0;
