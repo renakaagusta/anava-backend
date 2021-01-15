@@ -128,7 +128,6 @@ exports.view = function (req, res) {
           console.log("answerIndex: "+index);
 
           answerForm.answers[index] = answer;
-          index = 0;
           index++;
 
           if (index == answerForm.answers.length) {
