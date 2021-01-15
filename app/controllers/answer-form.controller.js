@@ -157,7 +157,7 @@ exports.view = function (req, res) {
 
                   console.log(index);
 
-                  if (index == answerForm.questions.length - 1) {
+                  if (index == answerForm.questions.length) {
                     console.log("end");
                     return res.json({
                       status: "success",
