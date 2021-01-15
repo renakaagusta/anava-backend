@@ -123,7 +123,7 @@ exports.view = function (req, res) {
 
       answerForm.answers.forEach((answerId) => {
         Answer.findById(answerId, (err, answer) => {
-          console.log(errr)
+          console.log(err)
           if (err) return res.status(500).send(err);
           console.log("answerIndex: "+index);
 
@@ -144,6 +144,9 @@ exports.view = function (req, res) {
                 Question.findById(questionId, (err, question) => {
                   if (err) return res.status(500).send(err);
 
+
+          console.log("questionIndex: "+index);
+
                   question = JSON.parse(JSON.stringify(question));
                   question.content = null;
                   questions.answers = null;
@@ -154,6 +157,7 @@ exports.view = function (req, res) {
                   console.log(index);
 
                   if (index == answerForm.questions.length - 1) {
+                    console.log("end");
                     return res.json({
                       status: "success",
                       message: "AnswerForm Added Successfully",
