@@ -144,11 +144,11 @@ exports.view = function (req, res) {
                   if (err) return res.status(500).send(err);
 
 
-          console.log("questionIndex: "+index);
+                  console.log("questionIndex: "+index);
 
                   question = JSON.parse(JSON.stringify(question));
                   question.content = null;
-                  questions.answers = null;
+                  question.answers = null;
 
                   answerForm.questions[index] = question;
                   index++;
