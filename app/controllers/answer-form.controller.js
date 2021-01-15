@@ -383,76 +383,62 @@ exports.submit = async function (req, res) {
         answers.push(null);
       });
 
-      await Promise.all(
-        answerForm.questions.map(async (question) => {
-          await Question.findById(question, async (err, question) => {
-            if (err) return res.status(500).send(err);
-            index++;
+      index = 0;
 
-            console.log("nomor soal: " + question.number);
-            question = JSON.parse(JSON.stringify(question));
-            questions.push(question);
+      req.body.questions.forEach((question) => {
+        answers[question.number - 1] = req.body.answers[index];
 
-            if (questions.length == req.body.answers.length) {
-              index = 0;
+        console.log("ke: " + (index + 1));
+        console.log("nomor soal: " + question.number);
+        console.log("jawaban: " + req.body.answers[index]);
+        console.log("kunci: " + question.key);
+        if (req.body.answers[index] == question.key) {
+          correct++;
+        } else if (
+          req.body.answers[index] == "F" ||
+          req.body.answers[index] == null
+        ) {
+          empty++;
+        } else {
+          wrong++;
+        }
 
-              questions.forEach((question) => {
-                console.log(index + "b");
-                answers[question.number - 1] = req.body.answers[index];
+        index++;
 
-                console.log("ke: " + (index + 1));
-                console.log("nomor soal: " + question.number);
-                console.log("jawaban: " + req.body.answers[index]);
-                console.log("kunci: " + question.key);
-                if (req.body.answers[index] == question.key) {
-                  correct++;
-                } else if (
-                  req.body.answers[index] == "F" ||
-                  req.body.answers[index] == null
-                ) {
-                  empty++;
-                } else {
-                  wrong++;
-                }
+        if (index == req.body.answers.length) {
+          score = correct * 4 - wrong;
 
-                index++;
+          answerForm.score = score;
+          answerForm.correct = correct;
+          answerForm.empty = empty;
+          answerForm.wrong = wrong;
+          answerForm._answers = JSON.stringify(answers);
+          answerForm.updated_at = new Date();
 
-                if (index == req.body.answers.length) {
-                  score = correct * 4 - wrong;
+          console.log("score: " + answerForm.score);
+          console.log("correct: " + answerForm.correct);
+          console.log("empty: " + answerForm.empty);
+          console.log("wrong: " + answerForm.wrong);
 
-                  answerForm.score = score;
-                  answerForm.correct = correct;
-                  answerForm.empty = empty;
-                  answerForm.wrong = wrong;
-                  answerForm._answers = JSON.stringify(answers);
-                  answerForm.updated_at = new Date();
+          AnswerForm.findOneAndUpdate(
+            {
+              _id: answerForm._id,
+            },
+            answerForm,
+            { new: true },
+            function (err, answerForm) {
+              if (err) return res.status(500).send(err);
 
-                  console.log("score: " + answerForm.score);
-                  console.log("correct: " + answerForm.correct);
-                  console.log("empty: " + answerForm.empty);
-                  console.log("wrong: " + answerForm.wrong);
-
-                  AnswerForm.findOneAndUpdate(
-                    {
-                      _id: answerForm._id,
-                    },
-                    answerForm,
-                    { new: true },
-                    function (err, answerForm) {
-                      if (err) return res.status(500).send(err);
-
-                      return res.json({
-                        data: answerForm,
-                        message: "Successfully submitted",
-                      });
-                    }
-                  );
-                }
+              return res.json({
+                data: answerForm,
+                message: "Successfully submitted",
               });
             }
-          });
-        })
-      );
+          );
+        }
+
+        index++;
+      });
     });
   }
   if (req.body.eventName == "The One" && req.body.stageName == "preliminary") {
