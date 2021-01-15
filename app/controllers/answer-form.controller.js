@@ -150,7 +150,9 @@ exports.view = function (req, res) {
                   answerForm.questions[index] = question;
                   index++;
 
-                  if (index == answerForm.questions.length) {
+                  console.log(index);
+
+                  if (index == answerForm.questions.length - 1) {
                     return res.json({
                       status: "success",
                       message: "AnswerForm Added Successfully",
