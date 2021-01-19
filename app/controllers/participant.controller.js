@@ -106,7 +106,7 @@ exports.update = function (req, res) {
     { new: true },
     (err, participant) => {
       console.log(err);
-      console.log(participant)
+      console.log(participant);
       console.log(req.body);
       if (err) return res.status(400).send(err);
 
@@ -170,7 +170,7 @@ exports.upload = function (req, res) {
             updated_at: Date.now(),
           },
         },
-        { new: true}
+        { new: true }
       )
         .then((participant) => {
           if (participant) {
@@ -201,7 +201,7 @@ exports.upload = function (req, res) {
             updated_at: Date.now(),
           },
         },
-        { new: true}
+        { new: true }
       )
         .then((participant) => {
           if (participant) {
@@ -232,7 +232,7 @@ exports.upload = function (req, res) {
             updated_at: Date.now(),
           },
         },
-        { new: true}
+        { new: true }
       )
         .then((participant) => {
           if (participant) {
@@ -263,7 +263,7 @@ exports.upload = function (req, res) {
             updated_at: Date.now(),
           },
         },
-        { new: true}
+        { new: true }
       )
         .then((participant) => {
           if (participant) {

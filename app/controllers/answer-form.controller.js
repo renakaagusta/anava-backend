@@ -212,102 +212,162 @@ exports.create = async function (req, res) {
             });
 
             if (_event.name == "OSM" || _event.name == "The One") {
-              await AnswerForm({
-                stage: req.body.stageId,
-                participant: req.body.participantId,
-                answers: req.body.answers ? req.body.answers : [],
-              }).save(async (err, answerForm) => {
-                if (err) return res.status(400).json(err);
+              if (_event.name == "OSM" && _stage.name == "semifinal") {
+                await AnswerForm({
+                  stage: req.body.stageId,
+                  participant: req.body.participantId,
+                }).save(async (err, answerForm) => {
+                  if (err) return res.status(400).json(err);
 
-                await Stage.findById(
-                  req.body.stageId,
-                  async function (err, stage) {
-                    if (err) return res.status(400).send(err);
+                  await Stage.findById(
+                    req.body.stageId,
+                    async function (err, stage) {
+                      if (err) return res.status(400).send(err);
 
-                    await Stage.update(
-                      { _id: req.body.stageId },
-                      {
-                        $addToSet: {
-                          answer_forms: answerForm._id,
-                        },
-                      },
-                      { safe: true, upsert: true },
-                      async function (err, stage) {
-                        if (err) return res.status(400).json(err);
-
-                        await Question.find(
-                          {
-                            stage: req.body.stageId,
-                            session: session,
+                      await Stage.update(
+                        { _id: req.body.stageId },
+                        {
+                          $addToSet: {
+                            answer_forms: answerForm._id,
                           },
-                          async function (err, questions) {
-                            if (err) return res.status(400).send(err);
+                        },
+                        { safe: true, upsert: true },
+                        async function (err, stage) {
+                          if (err) return res.status(400).json(err);
 
-                            var currentIndex = questions.length,
-                              temporaryValue,
-                              randomIndex;
+                          var answer1 = new Answer({
+                            answer_form: answerForm._id,
+                          });
+                          var answer2 = new Answer({
+                            answer_form: answerForm._id,
+                          });
 
-                            // While there remain elements to shuffle...
-                            while (0 !== currentIndex) {
-                              // Pick a remaining element...
-                              randomIndex = Math.floor(
-                                Math.random() * currentIndex
+                          await answer1.save(async function (err, _answer1) {
+                            if (err) res.status(400).json(err);
+
+                            await answer2.save(async function (err, _answer2) {
+                              if (err) res.status(400).json(err);
+
+                              answerForm.answers.push(answer1._id.toString())
+                              answerForm.answers.push(answer2._id.toString())
+
+                              await answerForm.save(
+                                async function (err, answerForm) {
+                                  if (err) return res.status(400).json(err);
+
+                                  return res.json({
+                                    message: "Answer Form succesfully created",
+                                    data: answerForm,
+                                  });
+                                }
                               );
-                              currentIndex -= 1;
+                            })
+                          });
+                        }
+                      ).catch((error) => {
+                        console.log(error);
+                      });
+                    }
+                  );
+                });
+              } else {
+                await AnswerForm({
+                  stage: req.body.stageId,
+                  participant: req.body.participantId,
+                  answers: req.body.answers ? req.body.answers : [],
+                }).save(async (err, answerForm) => {
+                  if (err) return res.status(400).json(err);
 
-                              // And swap it with the current element.
-                              temporaryValue = questions[currentIndex];
-                              questions[currentIndex] = questions[randomIndex];
-                              questions[randomIndex] = temporaryValue;
-                            }
-                            console.log("ini lhooooo");
+                  await Stage.findById(
+                    req.body.stageId,
+                    async function (err, stage) {
+                      if (err) return res.status(400).send(err);
 
-                            var answers = [];
-                            await Promise.all(
-                              questions.map(async (question) => {
-                                await Answer({
-                                  answer_form: answerForm._id,
-                                  question: question._id,
-                                  key: question.key,
-                                }).save(function (err, answer) {
-                                  if (err) res.status(400).json(err);
+                      await Stage.update(
+                        { _id: req.body.stageId },
+                        {
+                          $addToSet: {
+                            answer_forms: answerForm._id,
+                          },
+                        },
+                        { safe: true, upsert: true },
+                        async function (err, stage) {
+                          if (err) return res.status(400).json(err);
 
-                                  answers.push(answer._id);
+                          await Question.find(
+                            {
+                              stage: req.body.stageId,
+                              session: session,
+                            },
+                            async function (err, questions) {
+                              if (err) return res.status(400).send(err);
 
-                                  if (answers.length == questions.length) {
-                                    answerForm.questions = questions;
-                                    answerForm.answers = answers;
-                                    answerForm.save(async function (
-                                      err,
-                                      answerForm
-                                    ) {
-                                      if (err) return res.status(400).json(err);
+                              var currentIndex = questions.length,
+                                temporaryValue,
+                                randomIndex;
 
-                                      answerForm = JSON.parse(
-                                        JSON.stringify(answerForm)
-                                      );
+                              // While there remain elements to shuffle...
+                              while (0 !== currentIndex) {
+                                // Pick a remaining element...
+                                randomIndex = Math.floor(
+                                  Math.random() * currentIndex
+                                );
+                                currentIndex -= 1;
 
-                                      answerForm.money = 20000;
+                                // And swap it with the current element.
+                                temporaryValue = questions[currentIndex];
+                                questions[currentIndex] = questions[randomIndex];
+                                questions[randomIndex] = temporaryValue;
+                              }
+                              console.log("ini lhooooo");
 
-                                      return res.json({
-                                        message:
-                                          "Answer Form succesfully created",
-                                        data: answerForm,
+                              var answers = [];
+                              await Promise.all(
+                                questions.map(async (question) => {
+                                  await Answer({
+                                    answer_form: answerForm._id,
+                                    question: question._id,
+                                    key: question.key,
+                                  }).save(function (err, answer) {
+                                    if (err) res.status(400).json(err);
+
+                                    answers.push(answer._id);
+
+                                    if (answers.length == questions.length) {
+                                      answerForm.questions = questions;
+                                      answerForm.answers = answers;
+                                      answerForm.save(async function (
+                                        err,
+                                        answerForm
+                                      ) {
+                                        if (err) return res.status(400).json(err);
+
+                                        answerForm = JSON.parse(
+                                          JSON.stringify(answerForm)
+                                        );
+
+                                        answerForm.money = 20000;
+
+                                        return res.json({
+                                          message:
+                                            "Answer Form succesfully created",
+                                          data: answerForm,
+                                        });
                                       });
-                                    });
-                                  }
-                                });
-                              })
-                            );
-                          }
-                        );
-                      }
-                    ).catch((error) => {
-                      console.log(error);
-                    });
-                  }
-                );
-              });
+                                    }
+                                  });
+                                })
+                              );
+                            }
+                          );
+                        }
+                      ).catch((error) => {
+                        console.log(error);
+                      });
+                    }
+                  );
+                });
+              }
             } else if (_event.name == "Started") {
               await AnswerForm({
                 stage: req.body.stageId,
@@ -482,74 +542,70 @@ exports.submit = async function (req, res) {
           answers.push(null);
         });
 
-        await Promise.all(
-          answerForm.questions.map(async (question) => {
-            await Question.findById(question, async (err, question) => {
-              if (err) return res.status(500).send(err);
-              answers[question.number - 1] = req.body.answers[index];
+        req.body.questions.forEach((question) => {
+          if (err) return res.status(500).send(err);
+          answers[question.number - 1] = req.body.answers[index];
+
+          index++;
+          question = JSON.parse(JSON.stringify(question));
+          questions.push(question);
+
+          if (questions.length == req.body.answers.length) {
+            index = 0;
+
+            questions.forEach((question) => {
+              console.log(index + "b");
+
+              console.log("ke: " + (index + 1));
+              console.log("nomor soal: " + question.number);
+              console.log("jawaban: " + req.body.answers[index]);
+              console.log("kunci: " + question.key);
+              if (req.body.answers[index] == question.key) {
+                correct++;
+                score += question.poin;
+              } else if (
+                req.body.answers[index] == "F" ||
+                req.body.answers[index] == null
+              ) {
+                empty++;
+              } else {
+                wrong++;
+              }
 
               index++;
-              question = JSON.parse(JSON.stringify(question));
-              questions.push(question);
 
-              if (questions.length == req.body.answers.length) {
-                index = 0;
+              if (index == req.body.answers.length) {
+                answerForm.score = score;
+                answerForm.correct = correct;
+                answerForm.empty = empty;
+                answerForm.wrong = wrong;
+                answerForm._answers = JSON.stringify(answers);
+                answerForm.updated_at = new Date();
 
-                questions.forEach((question) => {
-                  console.log(index + "b");
+                console.log("score: " + answerForm.score);
+                console.log("correct: " + answerForm.correct);
+                console.log("empty: " + answerForm.empty);
+                console.log("wrong: " + answerForm.wrong);
 
-                  console.log("ke: " + (index + 1));
-                  console.log("nomor soal: " + question.number);
-                  console.log("jawaban: " + req.body.answers[index]);
-                  console.log("kunci: " + question.key);
-                  if (req.body.answers[index] == question.key) {
-                    correct++;
-                    score += question.poin;
-                  } else if (
-                    req.body.answers[index] == "F" ||
-                    req.body.answers[index] == null
-                  ) {
-                    empty++;
-                  } else {
-                    wrong++;
+                AnswerForm.findOneAndUpdate(
+                  {
+                    _id: answerForm._id,
+                  },
+                  answerForm,
+                  { new: true },
+                  function (err, answerForm) {
+                    if (err) return res.status(500).send(err);
+
+                    return res.json({
+                      data: answerForm,
+                      message: "Successfully submitted",
+                    });
                   }
-
-                  index++;
-
-                  if (index == req.body.answers.length) {
-                    answerForm.score = score;
-                    answerForm.correct = correct;
-                    answerForm.empty = empty;
-                    answerForm.wrong = wrong;
-                    answerForm._answers = JSON.stringify(answers);
-                    answerForm.updated_at = new Date();
-
-                    console.log("score: " + answerForm.score);
-                    console.log("correct: " + answerForm.correct);
-                    console.log("empty: " + answerForm.empty);
-                    console.log("wrong: " + answerForm.wrong);
-
-                    AnswerForm.findOneAndUpdate(
-                      {
-                        _id: answerForm._id,
-                      },
-                      answerForm,
-                      { new: true },
-                      function (err, answerForm) {
-                        if (err) return res.status(500).send(err);
-
-                        return res.json({
-                          data: answerForm,
-                          message: "Successfully submitted",
-                        });
-                      }
-                    );
-                  }
-                });
+                );
               }
             });
-          })
-        );
+          }
+        });
       }
     );
   }
@@ -560,7 +616,8 @@ exports.submit = async function (req, res) {
     empty = 0;
     await AnswerForm.findOne(
       {
-        _id: req.body._id,
+        participant: req.body.participant,
+        stage: req.body.stage,
       },
       async (err, answerForm) => {
         if (err) return res.status(500).send(err);
@@ -573,75 +630,71 @@ exports.submit = async function (req, res) {
           answers.push(null);
         });
 
-        await Promise.all(
-          answerForm.questions.map(async (question) => {
-            await Question.findById(question, async (err, question) => {
-              if (err) return res.status(500).send(err);
-              answers[question.number - 1] = req.body.answers[index];
+        req.body.questions.forEach((question) => {
+          if (err) return res.status(500).send(err);
+          answers[question.number - 1] = req.body.answers[index];
+
+          index++;
+          question = JSON.parse(JSON.stringify(question));
+          questions.push(question);
+
+          if (questions.length == req.body.answers.length) {
+            index = 0;
+
+            questions.forEach((question) => {
+              console.log(index + "b");
+
+              console.log("ke: " + (index + 1));
+              console.log("nomor soal: " + question.number);
+              console.log("jawaban: " + req.body.answers[index]);
+              console.log("kunci: " + question.key);
+              if (req.body.answers[index] == question.key) {
+                correct++;
+                score += question.poin;
+              } else if (
+                req.body.answers[index] == "F" ||
+                req.body.answers[index] == null
+              ) {
+                empty++;
+              } else {
+                wrong++;
+              }
 
               index++;
-              question = JSON.parse(JSON.stringify(question));
-              questions.push(question);
 
-              if (questions.length == req.body.answers.length) {
-                index = 0;
+              if (index == req.body.answers.length) {
+                answerForm.score = score;
+                answerForm.correct = correct;
+                answerForm.empty = empty;
+                answerForm.wrong = wrong;
+                answerForm.money = req.body.money;
+                answerForm._answers = JSON.stringify(answers);
+                answerForm.updated_at = new Date();
 
-                questions.forEach((question) => {
-                  console.log(index + "b");
+                console.log("score: " + answerForm.score);
+                console.log("correct: " + answerForm.correct);
+                console.log("empty: " + answerForm.empty);
+                console.log("wrong: " + answerForm.wrong);
 
-                  console.log("ke: " + (index + 1));
-                  console.log("nomor soal: " + question.number);
-                  console.log("jawaban: " + req.body.answers[index]);
-                  console.log("kunci: " + question.key);
-                  if (req.body.answers[index] == question.key) {
-                    correct++;
-                    score += question.poin;
-                  } else if (
-                    req.body.answers[index] == "F" ||
-                    req.body.answers[index] == null
-                  ) {
-                    empty++;
-                  } else {
-                    wrong++;
+                AnswerForm.findOneAndUpdate(
+                  {
+                    _id: answerForm._id,
+                  },
+                  answerForm,
+                  { new: true },
+                  function (err, answerForm) {
+                    if (err) return res.status(500).send(err);
+
+                    return res.json({
+                      data: answerForm,
+                      message: "Successfully submitted",
+                    });
                   }
-
-                  index++;
-
-                  if (index == req.body.answers.length) {
-                    answerForm.score = score;
-                    answerForm.correct = correct;
-                    answerForm.empty = empty;
-                    answerForm.wrong = wrong;
-                    answerForm._answers = JSON.stringify(answers);
-                    answerForm.money = req.body.money;
-                    answerForm.updated_at = new Date();
-
-                    console.log("score: " + answerForm.score);
-                    console.log("correct: " + answerForm.correct);
-                    console.log("empty: " + answerForm.empty);
-                    console.log("wrong: " + answerForm.wrong);
-
-                    AnswerForm.findOneAndUpdate(
-                      {
-                        _id: answerForm._id,
-                      },
-                      answerForm,
-                      { new: true },
-                      function (err, answerForm) {
-                        if (err) return res.status(500).send(err);
-
-                        return res.json({
-                          data: answerForm,
-                          message: "Successfully submitted",
-                        });
-                      }
-                    );
-                  }
-                });
+                );
               }
             });
-          })
-        );
+          }
+        });
       }
     );
   }

@@ -6,13 +6,15 @@ const AnswerForm = db.answerForm;
 var multer = require("multer");
 var path = require("path");
 
-var id = "";
-
 const storage = multer.diskStorage({
   destination: path.join(__dirname + "./../../../"),
   filename: function (req, file, cb) {
-    console.log("id: "+ JSON.stringify(req.params.id));
-    cb(null, "answer_" + req.params.id + ".png");
+    console.log("id: " + JSON.stringify(req.body));
+    if (req.body.eventName == "OSM" && req.body.stageName == "semifinal") {
+      cb(null, "answer_" + req.params.id + ".pdf");
+    } else {
+      cb(null, "answer_" + req.params.id + ".png");
+    }
   },
 });
 
@@ -114,6 +116,8 @@ exports.update = function (req, res) {
 
 // Handle update actions
 exports.upload = function (req, res) {
+  console.log("oke")
+  console.log(req.file)
   upload(req, res, (err) => {
     if (err) return res.status(500).send(err);
     Answer.findOneAndUpdate(
@@ -125,7 +129,6 @@ exports.upload = function (req, res) {
     )
       .then((answer) => {
         if (answer) {
-          console.log("okeee")
           return res.json({
             message: "answer updated",
             data: answer,
