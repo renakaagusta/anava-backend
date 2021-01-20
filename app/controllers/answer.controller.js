@@ -12,6 +12,8 @@ const storage = multer.diskStorage({
     console.log("id: " + JSON.stringify(req.body));
     if (req.body.eventName == "OSM" && req.body.stageName == "semifinal") {
       cb(null, "answer_" + req.params.id + ".pdf");
+    } else if (req.body.eventName == "The One" && req.body.stageName == "semifinal") {
+      cb(null, "answer_" + req.params.id + ".pdf");
     } else {
       cb(null, "answer_" + req.params.id + ".png");
     }
@@ -116,8 +118,6 @@ exports.update = function (req, res) {
 
 // Handle update actions
 exports.upload = function (req, res) {
-  console.log("oke")
-  console.log(req.file)
   upload(req, res, (err) => {
     if (err) return res.status(500).send(err);
     Answer.findOneAndUpdate(

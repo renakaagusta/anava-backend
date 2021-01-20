@@ -209,7 +209,7 @@ exports.create = async function (req, res) {
                   _stage = stage;
                 }
               });
-            });
+            });console.log(_event.name);console.log(_stage.name)
 
             if (_event.name == "OSM" || _event.name == "The One") {
               if (_event.name == "OSM" && _stage.name == "semifinal") {
@@ -346,7 +346,7 @@ exports.create = async function (req, res) {
                                           JSON.stringify(answerForm)
                                         );
 
-                                        answerForm.money = 20000;
+                                        answerForm.money = 60;
 
                                         return res.json({
                                           message:
@@ -443,7 +443,7 @@ exports.create = async function (req, res) {
                                           JSON.stringify(answerForm)
                                         );
 
-                                        answerForm.money = 20000;
+                                        answerForm.money = 60;
 
                                         return res.json({
                                           message:
@@ -761,7 +761,7 @@ exports.submit = async function (req, res) {
 
               if (index == req.body.answers.length) {
                 answerForm.score = score;
-                answerForm.correct = correct;
+                answerForm.correct = 1;
                 answerForm.empty = empty;
                 answerForm.wrong = wrong;
                 answerForm.money = req.body.money;
