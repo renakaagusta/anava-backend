@@ -11,9 +11,9 @@ const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     console.log("id: " + JSON.stringify(req.body));
     if (req.body.eventName == "OSM" && req.body.stageName == "semifinal") {
-      cb(null, "answer_" + req.params.id + ".pdf");
+      cb(null, "answer_" + req.params.id + ".jpg");
     } else if (req.body.eventName == "The One" && req.body.stageName == "semifinal") {
-      cb(null, "answer_" + req.params.id + ".pdf");
+      cb(null, "answer_" + req.params.id + ".jpg");
     } else {
       cb(null, "answer_" + req.params.id + ".png");
     }
