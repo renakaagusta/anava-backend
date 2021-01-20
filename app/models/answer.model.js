@@ -18,6 +18,10 @@ const Answer = mongoose.model(
     key: {
       type: String,
     },
+    number: {
+      type: Number,
+      default: 0,
+    },
     uploaded: {
       type: Number,
       default: 0,

@@ -270,6 +270,103 @@ exports.create = async function (req, res) {
                     }
                   );
                 });
+              } else if (_event.name == "The One" && _stage.name == "semifinal") {
+                console.log("iokokokokok")
+                await AnswerForm({
+                  stage: req.body.stageId,
+                  participant: req.body.participantId,
+                  answers: req.body.answers ? req.body.answers : [],
+                }).save(async (err, answerForm) => {
+                  if (err) return res.status(400).json(err);
+
+                  await Stage.findById(
+                    req.body.stageId,
+                    async function (err, stage) {
+                      if (err) return res.status(400).send(err);
+
+                      await Stage.update(
+                        { _id: req.body.stageId },
+                        {
+                          $addToSet: {
+                            answer_forms: answerForm._id,
+                          },
+                        },
+                        { safe: true, upsert: true },
+                        async function (err, stage) {
+                          if (err) return res.status(400).json(err);
+
+                          await Question.find(
+                            {
+                              stage: req.body.stageId,
+                              session: session,
+                            },
+                            async function (err, questions) {
+                              if (err) return res.status(400).send(err);
+
+                              var currentIndex = questions.length,
+                                temporaryValue,
+                                randomIndex;
+
+                              // While there remain elements to shuffle...
+                              while (0 !== currentIndex) {
+                                // Pick a remaining element...
+                                randomIndex = Math.floor(
+                                  Math.random() * currentIndex
+                                );
+                                currentIndex -= 1;
+
+                                // And swap it with the current element.
+                                temporaryValue = questions[currentIndex];
+                                questions[currentIndex] = questions[randomIndex];
+                                questions[randomIndex] = temporaryValue;
+                              }
+                              
+                              var answers = [];
+                              await Promise.all(
+                                questions.map(async (question) => {
+                                  await Answer({
+                                    answer_form: answerForm._id,
+                                    question: question._id,
+                                    key: question.key,
+                                  }).save(function (err, answer) {
+                                    if (err) res.status(400).json(err);
+
+                                    answers.push(answer);
+
+                                    if (answers.length == questions.length) {
+                                      answerForm.questions = questions;
+                                      answerForm.answers = answers;
+                                      answerForm.save(async function (
+                                        err,
+                                        answerForm
+                                      ) {
+                                        if (err) return res.status(400).json(err);
+
+                                        answerForm = JSON.parse(
+                                          JSON.stringify(answerForm)
+                                        );
+
+                                        answerForm.money = 20000;
+
+                                        return res.json({
+                                          message:
+                                            "Answer Form succesfully created",
+                                          data: answerForm,
+                                        });
+                                      });
+                                    }
+                                  });
+                                })
+                              );
+                            }
+                          );
+                        }
+                      ).catch((error) => {
+                        console.log(error);
+                      });
+                    }
+                  );
+                });
               } else {
                 await AnswerForm({
                   stage: req.body.stageId,
