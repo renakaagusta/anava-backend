@@ -248,12 +248,14 @@ exports.create = async function (req, res) {
                             await answer2.save(async function (err, _answer2) {
                               if (err) res.status(400).json(err);
 
-                              answerForm.answers.push(answer1._id.toString())
-                              answerForm.answers.push(answer2._id.toString())
+                              answerForm.answers.push(answer1)
+                              answerForm.answers.push(answer2)
 
                               await answerForm.save(
                                 async function (err, answerForm) {
                                   if (err) return res.status(400).json(err);
+
+                                  console.log(answerForm)
 
                                   return res.json({
                                     message: "Answer Form succesfully created",
@@ -271,7 +273,6 @@ exports.create = async function (req, res) {
                   );
                 });
               } else if (_event.name == "The One" && _stage.name == "semifinal") {
-                console.log("iokokokokok")
                 await AnswerForm({
                   stage: req.body.stageId,
                   participant: req.body.participantId,

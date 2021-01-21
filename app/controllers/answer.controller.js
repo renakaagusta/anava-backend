@@ -14,6 +14,8 @@ const storage = multer.diskStorage({
       cb(null, "answer_" + req.params.id + ".jpg");
     } else if (req.body.eventName == "The One" && req.body.stageName == "semifinal") {
       cb(null, "answer_" + req.params.id + ".jpg");
+    } else if (req.body.eventName == "OSM" && req.body.stageName == "final") {
+      cb(null, "answer_" + req.params.id + ".jpg");
     } else {
       cb(null, "answer_" + req.params.id + ".png");
     }
