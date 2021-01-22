@@ -41,9 +41,11 @@ exports.indexByStage = function (req, res) {
         Participant.findById(answerForm.participant, (err, participant) => {
           if (err) return res.status(500).send(err);
 
-          answerForms[index].participant = participant;
-
-          index++;
+          answerForms.forEach((answerForm) => {
+            if (answerForm.participant == participant._id)
+              answerForms[index].participant = participant;
+            index++;
+          })
 
           if (answerForms.length == index) {
             return res.json({
@@ -209,7 +211,7 @@ exports.create = async function (req, res) {
                   _stage = stage;
                 }
               });
-            });console.log(_event.name);console.log(_stage.name)
+            }); console.log(_event.name); console.log(_stage.name)
 
             if (_event.name == "OSM" || _event.name == "The One") {
               if (_event.name == "OSM" && _stage.name == "semifinal") {
@@ -321,7 +323,7 @@ exports.create = async function (req, res) {
                                 questions[currentIndex] = questions[randomIndex];
                                 questions[randomIndex] = temporaryValue;
                               }
-                              
+
                               var answers = [];
                               await Promise.all(
                                 questions.map(async (question) => {
