@@ -131,7 +131,7 @@ exports.view = function (req, res) {
           index++;
 
           if (index == answerForm.answers.length) {
-            if (answerForm.stage == "5fcde27a333a4119d266771d") {
+            if (answerForm.stage == "5fcde27a333a4119d266771d" || answerForm.stage == "5fcde27a333a4119d2667716") {
               return res.json({
                 status: "success",
                 message: "AnswerForm Added Successfully",
