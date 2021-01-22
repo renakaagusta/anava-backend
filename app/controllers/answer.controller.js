@@ -11,11 +11,15 @@ const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     console.log("id: " + JSON.stringify(req.body));
     if (req.body.eventName == "OSM" && req.body.stageName == "semifinal") {
-      cb(null, "answer_" + req.params.id + ".jpg");
+      cb(null, "answer_" + req.params.id + ".pdf");
     } else if (req.body.eventName == "The One" && req.body.stageName == "semifinal") {
       cb(null, "answer_" + req.params.id + ".jpg");
     } else if (req.body.eventName == "OSM" && req.body.stageName == "final") {
-      cb(null, "answer_" + req.params.id + ".jpg");
+      if (req.body.number == "1" || req.body.number == 1) {
+        cb(null, "answer_" + req.params.id + ".pdf");
+      } else {
+        cb(null, "answer_" + req.params.id + ".ppt");
+      }
     } else {
       cb(null, "answer_" + req.params.id + ".png");
     }
