@@ -138,8 +138,8 @@ exports.view = function (req, res) {
               answerForm.answers[_index] = answer; 
             _index++;
           })
-
-          //answerForm.answers[index] = answer;
+          
+          answerForm.answers[index] = answer;
           index++;
 
           if (index == answerForm.answers.length) {
@@ -225,6 +225,66 @@ exports.create = async function (req, res) {
 
             if (_event.name == "OSM" || _event.name == "The One") {
               if (_event.name == "OSM" && _stage.name == "semifinal") {
+                await AnswerForm({
+                  stage: req.body.stageId,
+                  participant: req.body.participantId,
+                }).save(async (err, answerForm) => {
+                  if (err) return res.status(400).json(err);
+
+                  await Stage.findById(
+                    req.body.stageId,
+                    async function (err, stage) {
+                      if (err) return res.status(400).send(err);
+
+                      await Stage.update(
+                        { _id: req.body.stageId },
+                        {
+                          $addToSet: {
+                            answer_forms: answerForm._id,
+                          },
+                        },
+                        { safe: true, upsert: true },
+                        async function (err, stage) {
+                          if (err) return res.status(400).json(err);
+
+                          var answer1 = new Answer({
+                            answer_form: answerForm._id,
+                          });
+                          var answer2 = new Answer({
+                            answer_form: answerForm._id,
+                          });
+
+                          await answer1.save(async function (err, _answer1) {
+                            if (err) res.status(400).json(err);
+
+                            await answer2.save(async function (err, _answer2) {
+                              if (err) res.status(400).json(err);
+
+                              answerForm.answers.push(answer1)
+                              answerForm.answers.push(answer2)
+
+                              await answerForm.save(
+                                async function (err, answerForm) {
+                                  if (err) return res.status(400).json(err);
+
+                                  console.log(answerForm)
+
+                                  return res.json({
+                                    message: "Answer Form succesfully created",
+                                    data: answerForm,
+                                  });
+                                }
+                              );
+                            })
+                          });
+                        }
+                      ).catch((error) => {
+                        console.log(error);
+                      });
+                    }
+                  );
+                });
+              } else if (_event.name == "OSM" && _stage.name == "final") {
                 await AnswerForm({
                   stage: req.body.stageId,
                   participant: req.body.participantId,
