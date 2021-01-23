@@ -130,7 +130,6 @@ exports.view = function (req, res) {
         Answer.findById(answerId, (err, answer) => {
           console.log(err);
           if (err) return res.status(500).send(err);
-          console.log("answerIndex: " + index);
 
           var _index = 0;
           answerForm.answers.forEach((answerId)=>{
@@ -139,11 +138,10 @@ exports.view = function (req, res) {
             _index++;
           })
           
-          answerForm.answers[index] = answer;
           index++;
 
           if (index == answerForm.answers.length) {
-            if (answerForm.stage == "5fcde27a333a4119d266771d" || answerForm.stage == "5fcde27a333a4119d2667716") {
+            if (answerForm.stage == "5fcde27a333a4119d266771d" || answerForm.stage == "5fcde27a333a4119d2667716" || answerForm.stage == "5fcde27a333a4119d2667717") {
               return res.json({
                 status: "success",
                 message: "AnswerForm Added Successfully",
