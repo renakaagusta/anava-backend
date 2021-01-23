@@ -41,11 +41,14 @@ exports.indexByStage = function (req, res) {
         Participant.findById(answerForm.participant, (err, participant) => {
           if (err) return res.status(500).send(err);
 
+          var _index = 0;
+
           answerForms.forEach((answerForm) => {
             if (answerForm.participant == participant._id)
-              answerForms[index].participant = participant;
-            index++;
+              answerForms[_index].participant = participant;
+              _index++;
           })
+          index++;
 
           if (answerForms.length == index) {
             return res.json({
