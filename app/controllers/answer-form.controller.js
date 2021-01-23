@@ -132,7 +132,14 @@ exports.view = function (req, res) {
           if (err) return res.status(500).send(err);
           console.log("answerIndex: " + index);
 
-          answerForm.answers[index] = answer;
+          var _index = 0;
+          answerForm.answers.forEach((answerId)=>{
+            if(answer._id == answerId)
+              answerForm.answers[_index] = answer; 
+            _index++;
+          })
+
+          //answerForm.answers[index] = answer;
           index++;
 
           if (index == answerForm.answers.length) {
