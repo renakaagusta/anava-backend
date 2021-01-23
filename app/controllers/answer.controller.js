@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
       if (req.body.number == "1" || req.body.number == 1) {
         cb(null, "answer_" + req.params.id + ".pdf");
       } else {
-        cb(null, "answer_" + req.params.id + ".ppt");
+        cb(null, "answer_" + req.params.id + ".pptx");
       }
     } else {
       cb(null, "answer_" + req.params.id + ".png");
