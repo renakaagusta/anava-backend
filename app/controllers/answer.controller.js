@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
         cb(null, "answer_" + req.params.id + ".pptx");
       }
     } else {
-      cb(null, "answer_" + req.params.id + ".png");
+      cb(null, "answer_" + req.params.id + ".pdf");
     }
   },
 });
